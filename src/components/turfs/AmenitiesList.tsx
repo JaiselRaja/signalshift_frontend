@@ -17,7 +17,7 @@ export default function AmenitiesList({ amenities }: { amenities: Amenity[] }) {
           key={i}
           className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium ${
             a.available === false
-              ? "border-white/[0.04] text-[var(--text-muted)] line-through"
+              ? "border-[#bfcab7]/10 text-[#707a6a] line-through"
               : "border-emerald-500/20 bg-emerald-500/5 text-emerald-400"
           }`}
         >

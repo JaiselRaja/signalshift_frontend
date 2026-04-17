@@ -45,15 +45,15 @@ export default function SlotCalendar({ availabilityRange, selectedDate, onSelect
             onClick={() => onSelectDate(dateStr)}
             className={`flex shrink-0 flex-col items-center gap-1 rounded-xl border px-3 py-2.5 transition-all ${
               isSelected
-                ? "border-indigo-500/50 bg-indigo-500/15 text-white"
-                : "border-white/[0.06] bg-white/[0.02] text-[var(--text-secondary)] hover:border-white/20 hover:bg-white/[0.04]"
+                ? "border-[#004900]/40 bg-[#004900]/10 text-[#191c1d]"
+                : "border-[#bfcab7]/20 bg-white text-[#404a3b] hover:border-[#bfcab7]/40 hover:bg-[#f3f4f5]"
             }`}
           >
-            <span className={`text-[10px] font-medium uppercase tracking-wider ${isSelected ? "text-indigo-300" : "text-[var(--text-muted)]"}`}>
+            <span className={`text-[10px] font-medium uppercase tracking-wider ${isSelected ? "text-[#004900]" : "text-[#707a6a]"}`}>
               {isToday ? "Today" : DAY_LABELS[d.getDay()]}
             </span>
             <span className="text-lg font-bold leading-none">{d.getDate()}</span>
-            <span className={`text-[9px] ${isSelected ? "text-indigo-300" : "text-[var(--text-muted)]"}`}>
+            <span className={`text-[9px] ${isSelected ? "text-[#004900]" : "text-[#707a6a]"}`}>
               {MONTH_LABELS[d.getMonth()]}
             </span>
             {/* Availability dot */}

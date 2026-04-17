@@ -37,14 +37,14 @@ export default function CancelBookingModal({ booking, turfName, onConfirm, onClo
       <div className="glass-card w-full max-w-md p-6 animate-fade-in bottom-sheet sm:rounded-2xl">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-base font-bold text-[var(--text-primary)]">Cancel Booking</h2>
-            <p className="mt-0.5 text-sm text-[var(--text-muted)]">
+            <h2 className="text-base font-bold text-[#191c1d]">Cancel Booking</h2>
+            <p className="mt-0.5 text-sm text-[#707a6a]">
               {turfName} · {formatDate(booking.booking_date)} · {formatTime(booking.start_time)} – {formatTime(booking.end_time)}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="shrink-0 rounded-lg p-1.5 text-[var(--text-muted)] hover:bg-white/[0.06] hover:text-white transition-colors"
+            className="shrink-0 rounded-lg p-1.5 text-[#707a6a] hover:bg-[#f3f4f5] hover:text-[#191c1d] transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -57,7 +57,7 @@ export default function CancelBookingModal({ booking, turfName, onConfirm, onClo
         </div>
 
         <div className="mt-4">
-          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[#707a6a]">
             Reason for cancellation <span className="text-red-400">*</span>
           </label>
           <textarea
@@ -65,7 +65,7 @@ export default function CancelBookingModal({ booking, turfName, onConfirm, onClo
             onChange={(e) => setReason(e.target.value)}
             placeholder="Please provide a reason..."
             rows={3}
-            className="w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder-[var(--text-muted)] outline-none focus:border-indigo-500/40"
+            className="w-full resize-none rounded-lg border border-[#bfcab7]/30 bg-white px-3 py-2.5 text-sm text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-[#004900]/40"
           />
         </div>
 
@@ -77,7 +77,7 @@ export default function CancelBookingModal({ booking, turfName, onConfirm, onClo
           <button
             onClick={onClose}
             disabled={submitting}
-            className="flex-1 rounded-xl border border-white/[0.08] py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-white/[0.04] disabled:opacity-50 transition-colors"
+            className="flex-1 rounded-xl border border-[#bfcab7]/20 py-2.5 text-sm font-medium text-[#404a3b] hover:bg-[#f3f4f5] disabled:opacity-50 transition-colors"
           >
             Keep Booking
           </button>

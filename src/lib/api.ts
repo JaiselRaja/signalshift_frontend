@@ -49,9 +49,12 @@ export function getToken(): string | null {
   return accessToken;
 }
 
-/** Sets a placeholder token so protected routes render without a real backend. */
+/** Sets a placeholder token so protected routes render without a real backend. Development only. */
 export function setPreviewToken() {
-  // A structurally valid (but unsigned) JWT-like string the client treats as a token.
+  if (process.env.NODE_ENV !== "development") {
+    console.warn("setPreviewToken() is only available in development mode.");
+    return;
+  }
   const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const payload = btoa(
     JSON.stringify({
@@ -142,7 +145,11 @@ async function request<T>(
 
   const config: RequestInit = {
     method,
-    headers: { "Content-Type": "application/json", ...headers },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Tenant-Slug": TENANT_SLUG,
+      ...headers,
+    },
   };
 
   if (body && method !== "GET") {

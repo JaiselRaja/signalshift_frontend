@@ -33,7 +33,7 @@ export default function SlotGrid({ slots, selectedSlot, onSelectSlot }: Props) {
   if (slots.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-center">
-        <p className="text-sm text-[var(--text-muted)]">No slots configured for this day.</p>
+        <p className="text-sm text-[#707a6a]">No slots configured for this day.</p>
       </div>
     );
   }
@@ -59,23 +59,23 @@ export default function SlotGrid({ slots, selectedSlot, onSelectSlot }: Props) {
             onClick={() => !disabled && onSelectSlot(slot)}
             className={`flex flex-col gap-1 rounded-xl border p-3 text-left transition-all ${
               disabled
-                ? "cursor-not-allowed border-white/[0.04] bg-white/[0.01] opacity-40"
+                ? "cursor-not-allowed border-[#bfcab7]/10 bg-[#f3f4f5] opacity-40"
                 : isSelected
-                ? "border-indigo-500 bg-indigo-500/15 shadow-lg shadow-indigo-500/10"
-                : "border-white/[0.06] bg-white/[0.02] hover:border-indigo-500/30 hover:bg-indigo-500/5"
+                ? "border-[#004900] bg-[#004900]/10 shadow-lg shadow-[#004900]/10"
+                : "border-[#bfcab7]/20 bg-white hover:border-[#004900]/30 hover:bg-[#004900]/5"
             }`}
           >
             {/* Time range */}
-            <span className={`font-mono text-xs font-semibold leading-tight ${disabled ? "text-[var(--text-muted)] line-through" : isSelected ? "text-white" : "text-[var(--text-primary)]"}`}>
+            <span className={`font-mono text-xs font-semibold leading-tight ${disabled ? "text-[#707a6a] line-through" : isSelected ? "text-[#191c1d]" : "text-[#191c1d]"}`}>
               {formatTime(slot.start_time)}
             </span>
-            <span className={`font-mono text-[10px] ${disabled ? "text-[var(--text-muted)]" : "text-[var(--text-secondary)]"}`}>
+            <span className={`font-mono text-[10px] ${disabled ? "text-[#707a6a]" : "text-[#404a3b]"}`}>
               → {formatTime(slot.end_time)}
             </span>
 
             {/* Duration + type */}
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[10px] text-[var(--text-muted)]">{slot.duration_mins}m</span>
+              <span className="text-[10px] text-[#707a6a]">{slot.duration_mins}m</span>
               {slot.slot_type !== "regular" && (
                 <span className={`rounded px-1 py-0.5 text-[9px] font-medium capitalize ${SLOT_TYPE_STYLES[slot.slot_type] ?? "text-slate-400 bg-slate-500/10"}`}>
                   {slot.slot_type}
@@ -84,7 +84,7 @@ export default function SlotGrid({ slots, selectedSlot, onSelectSlot }: Props) {
             </div>
 
             {/* Price */}
-            <span className={`text-xs font-bold mt-0.5 ${disabled ? "text-[var(--text-muted)]" : isSelected ? "text-indigo-300" : "text-[var(--text-primary)]"}`}>
+            <span className={`text-xs font-bold mt-0.5 ${disabled ? "text-[#707a6a]" : isSelected ? "text-[#004900]" : "text-[#191c1d]"}`}>
               {formatCurrency(slot.computed_price || slot.base_price)}
             </span>
           </button>

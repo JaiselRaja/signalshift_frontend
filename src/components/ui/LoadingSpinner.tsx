@@ -6,7 +6,7 @@ export default function LoadingSpinner({ size = "md", className = "" }: Props) {
   return (
     <div className={`flex items-center justify-center ${className}`}>
       <div
-        className={`${dim} ${border} rounded-full border-white/10 border-t-indigo-500 animate-spin`}
+        className={`${dim} ${border} rounded-full border-[#bfcab7]/30 border-t-[#004900] animate-spin`}
       />
     </div>
   );

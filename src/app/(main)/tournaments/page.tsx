@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { listTournaments } from "@/lib/api";
 import type { TournamentRead, TournamentStatus } from "@/types";
-import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import TournamentCard from "@/components/tournaments/TournamentCard";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 
@@ -59,7 +58,7 @@ function TournamentsContent() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 md:px-6">
-      <h1 className="mb-6 text-xl font-bold text-[var(--text-primary)]">Tournaments</h1>
+      <h1 className="mb-6 text-xl font-bold text-[#191c1d]">Tournaments</h1>
 
       {/* Filter tabs */}
       <div className="mb-5 flex gap-1 overflow-x-auto pb-1">
@@ -69,8 +68,8 @@ function TournamentsContent() {
             onClick={() => handleTabChange(tab.value)}
             className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
               activeTab === tab.value
-                ? "border-indigo-500/50 bg-indigo-500/15 text-indigo-300"
-                : "border-white/[0.06] text-[var(--text-muted)] hover:border-white/20 hover:text-[var(--text-secondary)]"
+                ? "border-[#004900]/40 bg-[#004900]/10 text-[#004900]"
+                : "border-[#bfcab7]/20 text-[#707a6a] hover:border-[#bfcab7]/40 hover:text-[#404a3b]"
             }`}
           >
             {tab.label}
@@ -79,20 +78,20 @@ function TournamentsContent() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</div>
+        <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
       {loading ? (
         <PageLoader />
       ) : tournaments.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.04]">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[var(--text-muted)]">
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#bfcab7]/10">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[#707a6a]">
               <path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4" />
               <path d="M19 7V4H8" />
             </svg>
           </div>
-          <p className="text-sm text-[var(--text-muted)]">No tournaments found.</p>
+          <p className="text-sm text-[#707a6a]">No tournaments found.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -106,9 +105,5 @@ function TournamentsContent() {
 }
 
 export default function TournamentsPage() {
-  return (
-    <ProtectedRoute>
-      <TournamentsContent />
-    </ProtectedRoute>
-  );
+  return <TournamentsContent />;
 }

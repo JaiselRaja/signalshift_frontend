@@ -17,17 +17,17 @@ export default function TurfCard({ turf }: Props) {
   const href = `/turfs/${turf.slug}?id=${turf.id}`;
 
   return (
-    <div className={`glass-card flex flex-col overflow-hidden transition-all duration-200 hover:border-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/5 ${!turf.is_active ? "opacity-60" : ""}`}>
+    <div className={`glass-card flex flex-col overflow-hidden transition-all duration-200 hover:border-[#004900]/15 hover:shadow-lg hover:shadow-[#004900]/5 ${!turf.is_active ? "opacity-60" : ""}`}>
       {/* Top color bar */}
-      <div className={`h-1 w-full ${turf.is_active ? "bg-gradient-to-r from-indigo-500 to-violet-500" : "bg-slate-700"}`} />
+      <div className={`h-1 w-full ${turf.is_active ? "bg-[#b2f746]" : "bg-slate-300"}`} />
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="font-semibold text-[var(--text-primary)] leading-tight">{turf.name}</h3>
+            <h3 className="font-semibold text-[#191c1d] leading-tight">{turf.name}</h3>
             {turf.city && (
-              <div className="mt-0.5 flex items-center gap-1 text-xs text-[var(--text-muted)]">
+              <div className="mt-0.5 flex items-center gap-1 text-xs text-[#707a6a]">
                 <LocationIcon />
                 {turf.city}
               </div>
@@ -51,7 +51,7 @@ export default function TurfCard({ turf }: Props) {
 
         {/* Address */}
         {turf.address && (
-          <p className="text-xs text-[var(--text-muted)] line-clamp-1">{turf.address}</p>
+          <p className="text-xs text-[#707a6a] line-clamp-1">{turf.address}</p>
         )}
 
         {/* CTA */}
@@ -59,12 +59,12 @@ export default function TurfCard({ turf }: Props) {
           {turf.is_active ? (
             <Link
               href={href}
-              className="block w-full rounded-lg bg-indigo-500/10 py-2 text-center text-xs font-semibold text-indigo-400 transition-colors hover:bg-indigo-500/20"
+              className="block w-full rounded-lg bg-[#004900]/10 py-2 text-center text-xs font-semibold text-[#004900] transition-colors hover:bg-[#004900]/15"
             >
               See Availability →
             </Link>
           ) : (
-            <span className="block w-full rounded-lg bg-white/[0.03] py-2 text-center text-xs font-medium text-[var(--text-muted)]">
+            <span className="block w-full rounded-lg bg-[#f3f4f5] py-2 text-center text-xs font-medium text-[#707a6a]">
               Not Available
             </span>
           )}

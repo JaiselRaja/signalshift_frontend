@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
-  getTournament, getTournamentStandings, getTournamentMatches,
+  getToken, getTournament, getTournamentStandings, getTournamentMatches,
   getMyTeams, registerTeam,
 } from "@/lib/api";
 import type { MatchRead, TeamRead, TeamStanding, TournamentRead } from "@/types";
-import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SportTag from "@/components/ui/SportTag";
 import StandingsTable from "@/components/tournaments/StandingsTable";
@@ -39,7 +38,10 @@ function TournamentDetailContent() {
 
   useEffect(() => {
     if (!tournamentId) return;
-    Promise.all([getTournament(tournamentId), getMyTeams()])
+    const teamsPromise = getToken()
+      ? getMyTeams().catch(() => [] as TeamRead[])
+      : Promise.resolve([] as TeamRead[]);
+    Promise.all([getTournament(tournamentId), teamsPromise])
       .then(([t, teams]) => {
         setTournament(t);
         setMyTeams(teams);
@@ -92,9 +94,9 @@ function TournamentDetailContent() {
     setShowRegister(false);
   }
 
-  if (!tournamentId) return <div className="p-8 text-[var(--text-muted)]">Invalid tournament link.</div>;
+  if (!tournamentId) return <div className="p-8 text-[#707a6a]">Invalid tournament link.</div>;
   if (loading) return <PageLoader />;
-  if (!tournament) return <div className="p-8 text-red-400">{error ?? "Tournament not found."}</div>;
+  if (!tournament) return <div className="p-8 text-red-700">{error ?? "Tournament not found."}</div>;
 
   const canRegister = tournament.status === "registration_open";
   const showStandingsTab = STANDINGS_FORMATS.has(tournament.format);
@@ -109,7 +111,7 @@ function TournamentDetailContent() {
     <div className="mx-auto max-w-3xl px-4 py-8 md:px-6">
       <button
         onClick={() => router.back()}
-        className="mb-6 flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-white"
+        className="mb-6 flex items-center gap-1.5 text-xs text-[#707a6a] hover:text-[#191c1d]"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
         Back
@@ -120,24 +122,30 @@ function TournamentDetailContent() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl font-bold text-[var(--text-primary)]">{tournament.name}</h1>
+              <h1 className="text-xl font-bold text-[#191c1d]">{tournament.name}</h1>
               <StatusBadge status={tournament.status} size="md" />
             </div>
             <div className="mt-1.5 flex items-center gap-2">
               <SportTag sport={tournament.sport_type} />
-              <span className="text-xs text-[var(--text-muted)] capitalize">{tournament.format.replace(/_/g, " ")}</span>
+              <span className="text-xs text-[#707a6a] capitalize">{tournament.format.replace(/_/g, " ")}</span>
             </div>
           </div>
           {canRegister && !registerSuccess && (
             <button
-              onClick={() => setShowRegister(true)}
-              className="shrink-0 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 hover:opacity-90"
+              onClick={() => {
+                if (!getToken()) {
+                  router.push(`/login?redirect=${encodeURIComponent(`/tournaments/${tournament.slug}?id=${tournament.id}`)}`);
+                  return;
+                }
+                setShowRegister(true);
+              }}
+              className="shrink-0 bg-[#b2f746] text-[#121f00] rounded-full font-bold shadow-lg shadow-[#004900]/10 hover:scale-[1.02] active:scale-95 transition-all px-5 py-2.5 text-sm"
             >
               Register Team
             </button>
           )}
           {registerSuccess && (
-            <span className="shrink-0 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-sm font-medium text-emerald-400">
+            <span className="shrink-0 rounded-xl bg-emerald-50 border border-emerald-500/20 px-4 py-2.5 text-sm font-medium text-emerald-700">
               Registered ✓
             </span>
           )}
@@ -145,15 +153,15 @@ function TournamentDetailContent() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-5 flex gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] p-1">
+      <div className="mb-5 flex gap-1 rounded-xl border border-[#bfcab7]/20 bg-[#f3f4f5] p-1">
         {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => handleTabChange(tab.value)}
             className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
               activeTab === tab.value
-                ? "bg-indigo-500/15 text-indigo-300 border border-indigo-500/30"
-                : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+                ? "bg-[#004900]/10 text-[#004900] border border-[#004900]/20"
+                : "text-[#707a6a] hover:text-[#404a3b]"
             }`}
           >
             {tab.label}
@@ -163,7 +171,7 @@ function TournamentDetailContent() {
 
       {tabLoading ? (
         <div className="flex justify-center py-12">
-          <span className="h-7 w-7 rounded-full border-2 border-white/10 border-t-indigo-400 animate-spin" />
+          <span className="h-7 w-7 rounded-full border-2 border-[#bfcab7]/20 border-t-[#004900] animate-spin" />
         </div>
       ) : (
         <>
@@ -171,41 +179,41 @@ function TournamentDetailContent() {
           {activeTab === "info" && (
             <div className="glass-card p-5 flex flex-col gap-3 animate-fade-in">
               <div className="flex justify-between text-sm">
-                <span className="text-[var(--text-secondary)]">Starts</span>
-                <span className="text-[var(--text-primary)]">{formatDate(tournament.tournament_starts)}</span>
+                <span className="text-[#404a3b]">Starts</span>
+                <span className="text-[#191c1d]">{formatDate(tournament.tournament_starts)}</span>
               </div>
               {tournament.tournament_ends && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-secondary)]">Ends</span>
-                  <span className="text-[var(--text-primary)]">{formatDate(tournament.tournament_ends)}</span>
+                  <span className="text-[#404a3b]">Ends</span>
+                  <span className="text-[#191c1d]">{formatDate(tournament.tournament_ends)}</span>
                 </div>
               )}
               {tournament.registration_starts && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-secondary)]">Registration opens</span>
-                  <span className="text-[var(--text-primary)]">{formatDate(tournament.registration_starts)}</span>
+                  <span className="text-[#404a3b]">Registration opens</span>
+                  <span className="text-[#191c1d]">{formatDate(tournament.registration_starts)}</span>
                 </div>
               )}
               {tournament.registration_ends && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-secondary)]">Registration closes</span>
-                  <span className="text-[var(--text-primary)]">{formatDate(tournament.registration_ends)}</span>
+                  <span className="text-[#404a3b]">Registration closes</span>
+                  <span className="text-[#191c1d]">{formatDate(tournament.registration_ends)}</span>
                 </div>
               )}
               {tournament.max_teams != null && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-secondary)]">Max teams</span>
-                  <span className="text-[var(--text-primary)]">{tournament.max_teams}</span>
+                  <span className="text-[#404a3b]">Max teams</span>
+                  <span className="text-[#191c1d]">{tournament.max_teams}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-[var(--text-secondary)]">Min teams</span>
-                <span className="text-[var(--text-primary)]">{tournament.min_teams}</span>
+                <span className="text-[#404a3b]">Min teams</span>
+                <span className="text-[#191c1d]">{tournament.min_teams}</span>
               </div>
               {tournament.entry_fee != null && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--text-secondary)]">Entry fee</span>
-                  <span className="text-indigo-300 font-semibold">
+                  <span className="text-[#404a3b]">Entry fee</span>
+                  <span className="text-[#004900] font-semibold">
                     {tournament.entry_fee === 0 ? "Free" : formatCurrency(tournament.entry_fee)}
                   </span>
                 </div>
@@ -217,7 +225,7 @@ function TournamentDetailContent() {
           {activeTab === "matches" && (
             <div className="animate-fade-in">
               {!matches || matches.length === 0 ? (
-                <p className="py-8 text-center text-sm text-[var(--text-muted)]">No matches scheduled yet.</p>
+                <p className="py-8 text-center text-sm text-[#707a6a]">No matches scheduled yet.</p>
               ) : (
                 <div className="flex flex-col gap-3">
                   {matches.map((m) => (
@@ -250,9 +258,5 @@ function TournamentDetailContent() {
 }
 
 export default function TournamentDetailPage() {
-  return (
-    <ProtectedRoute>
-      <TournamentDetailContent />
-    </ProtectedRoute>
-  );
+  return <TournamentDetailContent />;
 }

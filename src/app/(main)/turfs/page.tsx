@@ -3,16 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { listTurfs } from "@/lib/api";
 import type { TurfRead } from "@/types";
-import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import TurfCard from "@/components/turfs/TurfCard";
 import TurfFilters from "@/components/turfs/TurfFilters";
 import EmptyState from "@/components/ui/EmptyState";
-import { PageLoader } from "@/components/ui/LoadingSpinner";
 
 function TurfSkeleton() {
   return (
     <div className="glass-card overflow-hidden">
-      <div className="h-1 w-full bg-white/[0.04]" />
+      <div className="h-1 w-full bg-[#bfcab7]/10" />
       <div className="p-4 flex flex-col gap-3">
         <div className="skeleton h-5 w-3/4" />
         <div className="skeleton h-3 w-1/2" />
@@ -64,8 +62,8 @@ function TurfsContent() {
     <div className="mx-auto max-w-6xl px-4 py-8 md:px-6">
       {/* Page header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-[var(--text-primary)] md:text-3xl">Browse Turfs</h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
+        <h1 className="text-2xl font-bold text-[#191c1d] md:text-3xl">Browse Turfs</h1>
+        <p className="mt-1 text-sm text-[#707a6a]">
           {loading ? "Loading available turfs..." : `${turfs.length} turf${turfs.length !== 1 ? "s" : ""} available`}
         </p>
       </div>
@@ -89,10 +87,10 @@ function TurfsContent() {
       {error === "offline" && (
         <div className="mb-6 rounded-xl border border-amber-500/20 bg-amber-500/5 px-5 py-4">
           <p className="text-sm font-semibold text-amber-400">Backend is not running</p>
-          <p className="mt-1 text-xs text-[var(--text-secondary)]">
+          <p className="mt-1 text-xs text-[#404a3b]">
             Start the API server to see turfs added in the admin console.
           </p>
-          <code className="mt-2 block rounded-lg bg-white/[0.04] px-3 py-2 text-xs font-mono text-[var(--text-secondary)]">
+          <code className="mt-2 block rounded-lg bg-[#bfcab7]/10 px-3 py-2 text-xs font-mono text-[#404a3b]">
             cd signal-shift-api &amp;&amp; uvicorn app.main:app --reload
           </code>
         </div>
@@ -100,7 +98,7 @@ function TurfsContent() {
 
       {/* Generic error */}
       {error === "error" && (
-        <div className="mb-6 rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">
+        <div className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
           Failed to load turfs. Please try again.
         </div>
       )}
@@ -129,7 +127,7 @@ function TurfsContent() {
             (cityFilter || sportFilter || searchQuery) ? (
               <button
                 onClick={() => { setCityFilter(null); setSportFilter(null); setSearchQuery(""); }}
-                className="rounded-lg bg-indigo-500/10 px-4 py-2 text-sm font-medium text-indigo-400 hover:bg-indigo-500/20"
+                className="rounded-lg bg-[#004900]/10 px-4 py-2 text-sm font-medium text-[#004900] hover:bg-[#004900]/15"
               >
                 Clear filters
               </button>
@@ -142,9 +140,5 @@ function TurfsContent() {
 }
 
 export default function TurfsPage() {
-  return (
-    <ProtectedRoute>
-      <TurfsContent />
-    </ProtectedRoute>
-  );
+  return <TurfsContent />;
 }

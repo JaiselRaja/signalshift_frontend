@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getTeam, getTeamMembers, addTeamMember, removeTeamMember, getMe } from "@/lib/api";
+import { getToken, getTeam, getTeamMembers, addTeamMember, removeTeamMember, getMe } from "@/lib/api";
 import type { MembershipRead, TeamRead, UserRead } from "@/types";
-import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import MembersList from "@/components/teams/MembersList";
 import SportTag from "@/components/ui/SportTag";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
@@ -26,7 +25,8 @@ function TeamDetailContent() {
 
   useEffect(() => {
     if (!teamId) return;
-    Promise.all([getTeam(teamId), getTeamMembers(teamId), getMe()])
+    const mePromise = getToken() ? getMe().catch(() => null) : Promise.resolve(null);
+    Promise.all([getTeam(teamId), getTeamMembers(teamId), mePromise])
       .then(([t, m, u]) => {
         setTeam(t);
         setMembers(m);
@@ -64,15 +64,15 @@ function TeamDetailContent() {
     }
   }
 
-  if (!teamId) return <div className="p-8 text-[var(--text-muted)]">Invalid team link.</div>;
+  if (!teamId) return <div className="p-8 text-[#707a6a]">Invalid team link.</div>;
   if (loading) return <PageLoader />;
-  if (!team) return <div className="p-8 text-red-400">{error ?? "Team not found."}</div>;
+  if (!team) return <div className="p-8 text-red-700">{error ?? "Team not found."}</div>;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 md:px-6">
       <button
         onClick={() => router.back()}
-        className="mb-6 flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-white"
+        className="mb-6 flex items-center gap-1.5 text-xs text-[#707a6a] hover:text-[#191c1d]"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
         Back to Teams
@@ -81,7 +81,7 @@ function TeamDetailContent() {
       {/* Team header */}
       <div className="glass-card mb-5 p-5 animate-fade-in">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-300 text-xl font-bold">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#004900]/10 text-[#004900] text-xl font-bold">
             {team.logo_url ? (
               <img src={team.logo_url} alt={team.name} className="h-full w-full rounded-2xl object-cover" />
             ) : (
@@ -89,10 +89,10 @@ function TeamDetailContent() {
             )}
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[var(--text-primary)]">{team.name}</h1>
+            <h1 className="text-xl font-bold text-[#191c1d]">{team.name}</h1>
             <div className="mt-1 flex items-center gap-2">
               <SportTag sport={team.sport_type} />
-              <span className="text-xs text-[var(--text-muted)]">{members.length} member{members.length !== 1 ? "s" : ""}</span>
+              <span className="text-xs text-[#707a6a]">{members.length} member{members.length !== 1 ? "s" : ""}</span>
             </div>
           </div>
         </div>
@@ -100,25 +100,25 @@ function TeamDetailContent() {
 
       {/* Members section */}
       <div className="glass-card p-5 animate-fade-in">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Members</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#707a6a]">Members</p>
         <MembersList members={members} canManage={canManage} onRemove={handleRemove} />
 
         {/* Add member form */}
         {canManage && (
-          <form onSubmit={handleAddMember} className="mt-4 border-t border-white/[0.06] pt-4">
-            <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Add Member</p>
+          <form onSubmit={handleAddMember} className="mt-4 border-t border-[#bfcab7]/20 pt-4">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#707a6a]">Add Member</p>
             <div className="flex gap-2">
               <input
                 type="text"
                 placeholder="User ID"
                 value={addUserId}
                 onChange={(e) => setAddUserId(e.target.value)}
-                className="flex-1 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm font-mono text-white placeholder-[var(--text-muted)] outline-none focus:border-indigo-500/40"
+                className="flex-1 rounded-lg border border-[#bfcab7]/30 bg-white px-3 py-2.5 text-sm font-mono text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-[#004900]/40"
               />
               <select
                 value={addRole}
                 onChange={(e) => setAddRole(e.target.value as "player" | "captain")}
-                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500/40"
+                className="rounded-lg border border-[#bfcab7]/30 bg-white px-3 py-2.5 text-sm text-[#191c1d] outline-none focus:border-[#004900]/40"
               >
                 <option value="player">Player</option>
                 <option value="captain">Captain</option>
@@ -126,12 +126,12 @@ function TeamDetailContent() {
               <button
                 type="submit"
                 disabled={!addUserId.trim() || adding}
-                className="shrink-0 rounded-lg bg-indigo-500/10 px-4 py-2.5 text-xs font-semibold text-indigo-400 hover:bg-indigo-500/20 disabled:opacity-40 transition-colors"
+                className="shrink-0 rounded-lg bg-[#004900]/10 px-4 py-2.5 text-xs font-semibold text-[#004900] hover:bg-[#004900]/15 disabled:opacity-40 transition-colors"
               >
                 {adding ? "..." : "Add"}
               </button>
             </div>
-            {addError && <p className="mt-1.5 text-xs text-red-400">{addError}</p>}
+            {addError && <p className="mt-1.5 text-xs text-red-700">{addError}</p>}
           </form>
         )}
       </div>
@@ -140,9 +140,5 @@ function TeamDetailContent() {
 }
 
 export default function TeamDetailPage() {
-  return (
-    <ProtectedRoute>
-      <TeamDetailContent />
-    </ProtectedRoute>
-  );
+  return <TeamDetailContent />;
 }

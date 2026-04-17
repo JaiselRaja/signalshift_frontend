@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { sendOtp, verifyOtp, googleSignIn, devLogin, setPreviewToken, getToken } from "@/lib/api";
 
 export default function LoginPage() {
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const googleBtnRef = useRef<HTMLDivElement>(null);
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
+  const isDev = process.env.NODE_ENV === "development";
 
   // Redirect if already logged in
   useEffect(() => {
@@ -160,32 +162,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0a0b0f] px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f9fa] px-4">
       {/* Glow effect */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/10 blur-[120px]" />
+        <div className="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#004900]/5 blur-[120px]" />
       </div>
 
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center gap-3 animate-fade-in">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 shadow-xl shadow-indigo-500/30">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-          </svg>
-        </div>
+        <Image src="/logo.png" alt="Signal Shift" width={56} height={51} className="h-14 w-auto" />
         <div className="text-center">
-          <div className="text-lg font-bold tracking-widest text-white">SIGNAL SHIFT</div>
-          <div className="text-xs text-[var(--text-muted)]">Book · Play · Win</div>
+          <Image src="/logo-text.png" alt="SIGNAL SHIFT" width={160} height={30} className="h-7 w-auto" />
+          <div className="text-xs text-[#446900]/60">Book · Play · Win</div>
         </div>
       </div>
 
       {/* Auth card */}
       <div className="w-full max-w-sm animate-slide-up">
-      <div className="glass-card p-8">
+      <div className="bg-white rounded-2xl p-8 shadow-lg shadow-[#004900]/5">
         {step === "email" ? (
           <>
-            <h1 className="mb-1 text-xl font-bold text-[var(--text-primary)]">Sign in</h1>
-            <p className="mb-6 text-sm text-[var(--text-muted)]">
+            <h1 className="mb-1 text-xl font-bold text-[#191c1d]">Sign in</h1>
+            <p className="mb-6 text-sm text-[#707a6a]">
               We&apos;ll send a one-time code to your email.
             </p>
 
@@ -195,20 +193,20 @@ export default function LoginPage() {
                 <div ref={googleBtnRef} className="w-full" />
                 {loading && (
                   <div className="flex justify-center">
-                    <span className="h-4 w-4 rounded-full border-2 border-white/20 border-t-indigo-400 animate-spin" />
+                    <span className="h-4 w-4 rounded-full border-2 border-[#bfcab7]/40 border-t-[#004900] animate-spin" />
                   </div>
                 )}
                 <div className="flex items-center gap-3">
-                  <div className="h-px flex-1 bg-white/[0.08]" />
-                  <span className="text-xs text-[var(--text-muted)]">or continue with email</span>
-                  <div className="h-px flex-1 bg-white/[0.08]" />
+                  <div className="h-px flex-1 bg-[#bfcab7]/30" />
+                  <span className="text-xs text-[#707a6a]">or continue with email</span>
+                  <div className="h-px flex-1 bg-[#bfcab7]/30" />
                 </div>
               </div>
             )}
 
             <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+                <label className="text-xs font-medium uppercase tracking-wider text-[#707a6a]">
                   Email address
                 </label>
                 <input
@@ -218,22 +216,22 @@ export default function LoginPage() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setError(null); }}
-                  className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-3 text-sm text-white placeholder-[var(--text-muted)] outline-none transition-colors focus:border-indigo-500/50 focus:bg-white/[0.05]"
+                  className="w-full border border-[#bfcab7]/40 bg-white px-3 py-3 text-sm text-[#191c1d] placeholder-[#707a6a] rounded-xl outline-none focus:border-[#004900]/50 focus:ring-2 focus:ring-[#004900]/10 transition-colors"
                 />
               </div>
 
               {error && (
-                <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400">{error}</p>
+                <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">{error}</p>
               )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="flex w-full items-center justify-center bg-[#b2f746] text-[#121f00] rounded-full py-3.5 text-sm font-bold shadow-lg shadow-[#004900]/10 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <span className="h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                    <span className="h-4 w-4 rounded-full border-2 border-[#bfcab7]/40 border-t-[#004900] animate-spin" />
                     Sending...
                   </span>
                 ) : (
@@ -246,15 +244,15 @@ export default function LoginPage() {
           <>
             <button
               onClick={() => { setStep("email"); setError(null); }}
-              className="mb-4 flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-white"
+              className="mb-4 flex items-center gap-1.5 text-xs text-[#707a6a] hover:text-[#191c1d] transition-colors"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
               Back
             </button>
 
-            <h1 className="mb-1 text-xl font-bold text-[var(--text-primary)]">Enter OTP</h1>
-            <p className="mb-6 text-sm text-[var(--text-muted)]">
-              Sent to <span className="font-medium text-indigo-400">{email}</span>
+            <h1 className="mb-1 text-xl font-bold text-[#191c1d]">Enter OTP</h1>
+            <p className="mb-6 text-sm text-[#404a3b]">
+              Sent to <span className="text-[#004900] font-medium">{email}</span>
             </p>
 
             <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
@@ -271,23 +269,23 @@ export default function LoginPage() {
                     value={digit}
                     onChange={(e) => handleOtpChange(i, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                    className="h-12 w-10 rounded-lg border border-white/[0.08] bg-white/[0.03] text-center font-mono text-lg font-bold text-white outline-none transition-colors focus:border-indigo-500 focus:bg-white/[0.05]"
+                    className="h-12 w-10 rounded-xl border border-[#bfcab7]/40 bg-white text-center font-mono text-lg font-bold text-[#191c1d] outline-none transition-colors focus:border-[#004900] focus:ring-2 focus:ring-[#004900]/10"
                   />
                 ))}
               </div>
 
               {error && (
-                <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-400 text-center">{error}</p>
+                <p className="rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700 text-center">{error}</p>
               )}
 
               <button
                 type="submit"
                 disabled={loading || otp.join("").length < 6}
-                className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="flex w-full items-center justify-center bg-[#b2f746] text-[#121f00] rounded-full py-3.5 text-sm font-bold shadow-lg shadow-[#004900]/10 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <span className="h-4 w-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                    <span className="h-4 w-4 rounded-full border-2 border-[#bfcab7]/40 border-t-[#004900] animate-spin" />
                     Verifying...
                   </span>
                 ) : (
@@ -295,16 +293,16 @@ export default function LoginPage() {
                 )}
               </button>
 
-              <div className="text-center text-xs text-[var(--text-muted)]">
+              <div className="text-center text-xs text-[#707a6a]">
                 Didn&apos;t receive it?{" "}
                 {resendTimer > 0 ? (
-                  <span className="text-[var(--text-secondary)]">Resend in {resendTimer}s</span>
+                  <span className="text-[#404a3b]">Resend in {resendTimer}s</span>
                 ) : (
                   <button
                     type="button"
                     onClick={handleResend}
                     disabled={loading}
-                    className="text-indigo-400 hover:text-indigo-300 disabled:opacity-50"
+                    className="text-[#004900] hover:text-[#006400] disabled:opacity-50"
                   >
                     Resend OTP
                   </button>
@@ -315,11 +313,12 @@ export default function LoginPage() {
         )}
       </div>
 
-      {/* Dev tools panel */}
-      <div className="mt-3 w-full rounded-xl border border-amber-500/20 bg-amber-500/5 overflow-hidden">
+      {/* Dev tools panel — only visible in development */}
+      {isDev && (
+      <div className="mt-3 w-full rounded-xl border border-amber-400/30 bg-amber-50 overflow-hidden">
         <button
           onClick={() => setShowDevLogin((v) => !v)}
-          className="flex w-full items-center justify-between px-4 py-2.5 text-xs font-medium text-amber-400 hover:bg-amber-500/10 transition-colors"
+          className="flex w-full items-center justify-between px-4 py-2.5 text-xs font-medium text-amber-700 hover:bg-amber-100/60 transition-colors"
         >
           <span className="flex items-center gap-1.5">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -337,15 +336,15 @@ export default function LoginPage() {
             {/* Preview mode — no backend needed */}
             <button
               onClick={() => { setPreviewToken(); router.replace(redirect); }}
-              className="rounded-lg border border-sky-500/30 bg-sky-500/10 py-2.5 text-sm font-semibold text-sky-400 hover:bg-sky-500/20 transition-colors"
+              className="rounded-lg border border-sky-300/50 bg-sky-50 py-2.5 text-sm font-semibold text-sky-700 hover:bg-sky-100 transition-colors"
             >
               Preview UI (no backend)
             </button>
 
             <div className="flex items-center gap-2">
-              <div className="h-px flex-1 bg-white/[0.08]" />
-              <span className="text-[10px] text-[var(--text-muted)]">or with real backend</span>
-              <div className="h-px flex-1 bg-white/[0.08]" />
+              <div className="h-px flex-1 bg-amber-300/30" />
+              <span className="text-[10px] text-amber-600/70">or with real backend</span>
+              <div className="h-px flex-1 bg-amber-300/30" />
             </div>
 
             <form onSubmit={handleDevLogin} className="flex flex-col gap-2">
@@ -355,7 +354,7 @@ export default function LoginPage() {
                 value={devEmail}
                 onChange={(e) => setDevEmail(e.target.value)}
                 required
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white placeholder-[var(--text-muted)] outline-none focus:border-amber-500/40"
+                className="w-full rounded-lg border border-amber-300/40 bg-white px-3 py-2 text-sm text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10"
               />
               <input
                 type="password"
@@ -363,13 +362,13 @@ export default function LoginPage() {
                 value={devPassword}
                 onChange={(e) => setDevPassword(e.target.value)}
                 required
-                className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm text-white placeholder-[var(--text-muted)] outline-none focus:border-amber-500/40"
+                className="w-full rounded-lg border border-amber-300/40 bg-white px-3 py-2 text-sm text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10"
               />
-              {error && <p className="text-xs text-red-400">{error}</p>}
+              {error && <p className="text-xs text-red-700">{error}</p>}
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-lg bg-amber-500/15 py-2 text-sm font-semibold text-amber-400 hover:bg-amber-500/25 disabled:opacity-50 transition-colors"
+                className="rounded-lg bg-amber-100 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-200 disabled:opacity-50 transition-colors"
               >
                 {loading ? "Signing in..." : "Dev Login (needs backend)"}
               </button>
@@ -377,6 +376,7 @@ export default function LoginPage() {
           </div>
         )}
       </div>
+      )}
       </div>
     </div>
   );

@@ -12,13 +12,13 @@ const STATUS_STYLES: Record<string, string> = {
   completed: "bg-sky-500/10 text-sky-400 border-sky-500/20",
   cancelled: "bg-red-500/10 text-red-400 border-red-500/20",
   no_show: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-  refund_pending: "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  refund_pending: "bg-orange-500/10 text-orange-400 border-orange-500/20",
   refunded: "bg-teal-500/10 text-teal-400 border-teal-500/20",
   // Tournament statuses
   draft: "bg-slate-500/10 text-slate-400 border-slate-500/20",
   registration_open: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   registration_closed: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  in_progress: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+  in_progress: "bg-sky-500/10 text-sky-400 border-sky-500/20",
   // Match statuses
   scheduled: "bg-sky-500/10 text-sky-400 border-sky-500/20",
   live: "bg-red-500/10 text-red-400 border-red-500/20",

@@ -37,12 +37,12 @@ export default function RegisterTeamModal({ tournament, myTeams, onConfirm, onCl
       <div className="glass-card w-full max-w-md p-6 animate-fade-in bottom-sheet sm:rounded-2xl">
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-base font-bold text-[var(--text-primary)]">Register for Tournament</h2>
-            <p className="mt-0.5 text-sm text-[var(--text-muted)]">{tournament.name}</p>
+            <h2 className="text-base font-bold text-[#191c1d]">Register for Tournament</h2>
+            <p className="mt-0.5 text-sm text-[#707a6a]">{tournament.name}</p>
           </div>
           <button
             onClick={onClose}
-            className="shrink-0 rounded-lg p-1.5 text-[var(--text-muted)] hover:bg-white/[0.06] hover:text-white transition-colors"
+            className="shrink-0 rounded-lg p-1.5 text-[#707a6a] hover:bg-[#f3f4f5] hover:text-[#191c1d] transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -51,28 +51,28 @@ export default function RegisterTeamModal({ tournament, myTeams, onConfirm, onCl
         </div>
 
         {tournament.entry_fee != null && tournament.entry_fee > 0 && (
-          <div className="mb-4 rounded-xl border border-indigo-500/20 bg-indigo-500/5 px-3 py-2.5 flex justify-between items-center">
-            <span className="text-sm text-[var(--text-secondary)]">Entry fee</span>
-            <span className="text-sm font-bold text-indigo-300">{formatCurrency(tournament.entry_fee)}</span>
+          <div className="mb-4 rounded-xl border border-[#004900]/15 bg-[#004900]/10 px-3 py-2.5 flex justify-between items-center">
+            <span className="text-sm text-[#404a3b]">Entry fee</span>
+            <span className="text-sm font-bold text-[#004900]">{formatCurrency(tournament.entry_fee)}</span>
           </div>
         )}
 
         {myTeams.length === 0 ? (
           <div className="py-4 text-center">
-            <p className="text-sm text-[var(--text-muted)]">You don't have any teams yet.</p>
-            <a href="/teams" className="mt-2 inline-block text-sm text-indigo-400 hover:text-indigo-300">
+            <p className="text-sm text-[#707a6a]">You don't have any teams yet.</p>
+            <a href="/teams" className="mt-2 inline-block text-sm text-[#004900] hover:text-[#006400]">
               Create a team →
             </a>
           </div>
         ) : (
           <div className="mb-4">
-            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+            <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[#707a6a]">
               Select your team
             </label>
             <select
               value={selectedTeamId}
               onChange={(e) => setSelectedTeamId(e.target.value)}
-              className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500/40"
+              className="w-full rounded-lg border border-[#bfcab7]/30 bg-white px-3 py-2.5 text-sm text-[#191c1d] outline-none focus:border-[#004900]/40"
             >
               {myTeams.map((t) => (
                 <option key={t.id} value={t.id}>{t.name}</option>
@@ -87,7 +87,7 @@ export default function RegisterTeamModal({ tournament, myTeams, onConfirm, onCl
           <button
             onClick={onClose}
             disabled={submitting}
-            className="flex-1 rounded-xl border border-white/[0.08] py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-white/[0.04] disabled:opacity-50 transition-colors"
+            className="flex-1 rounded-xl border border-[#bfcab7]/20 py-2.5 text-sm font-medium text-[#404a3b] hover:bg-[#f3f4f5] disabled:opacity-50 transition-colors"
           >
             Cancel
           </button>
@@ -95,7 +95,7 @@ export default function RegisterTeamModal({ tournament, myTeams, onConfirm, onCl
             <button
               onClick={handleConfirm}
               disabled={!selectedTeamId || submitting}
-              className="flex-1 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-opacity hover:opacity-90"
+              className="flex-1 rounded-xl bg-[#b2f746] py-2.5 text-sm font-bold text-[#121f00] shadow-lg shadow-[#004900]/10 disabled:opacity-50 transition-opacity hover:opacity-90"
             >
               {submitting ? (
                 <span className="flex items-center justify-center gap-2">

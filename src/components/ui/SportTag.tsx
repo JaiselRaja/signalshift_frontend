@@ -1,11 +1,11 @@
 type Props = { sport: string; size?: "xs" | "sm" };
 
 const SPORT_STYLES: Record<string, string> = {
-  football: "bg-indigo-500/10 text-indigo-400",
+  football: "bg-lime-500/10 text-lime-400",
   cricket: "bg-emerald-500/10 text-emerald-400",
   hockey: "bg-amber-500/10 text-amber-400",
   badminton: "bg-sky-500/10 text-sky-400",
-  tennis: "bg-violet-500/10 text-violet-400",
+  tennis: "bg-purple-500/10 text-purple-400",
   basketball: "bg-orange-500/10 text-orange-400",
   volleyball: "bg-pink-500/10 text-pink-400",
 };

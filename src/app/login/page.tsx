@@ -131,12 +131,40 @@ export default function LoginPage() {
   }
 
   function handleOtpChange(i: number, val: string) {
-    const digit = val.replace(/\D/g, "").slice(-1);
+    const digits = val.replace(/\D/g, "");
+    setError(null);
+    if (digits.length > 1) {
+      const next = [...otp];
+      for (let k = 0; k < digits.length && i + k < 6; k++) {
+        next[i + k] = digits[k];
+      }
+      setOtp(next);
+      const lastFilled = Math.min(i + digits.length, 6) - 1;
+      if (lastFilled < 5) otpRefs.current[lastFilled + 1]?.focus();
+      else otpRefs.current[5]?.blur();
+      return;
+    }
+    const digit = digits.slice(-1);
     const next = [...otp];
     next[i] = digit;
     setOtp(next);
-    setError(null);
     if (digit && i < 5) otpRefs.current[i + 1]?.focus();
+  }
+
+  function handleOtpPaste(i: number, e: React.ClipboardEvent<HTMLInputElement>) {
+    const text = e.clipboardData.getData("text") ?? "";
+    const digits = text.replace(/\D/g, "");
+    if (digits.length <= 1) return;
+    e.preventDefault();
+    setError(null);
+    const next = [...otp];
+    for (let k = 0; k < digits.length && i + k < 6; k++) {
+      next[i + k] = digits[k];
+    }
+    setOtp(next);
+    const lastFilled = Math.min(i + digits.length, 6) - 1;
+    if (lastFilled < 5) otpRefs.current[lastFilled + 1]?.focus();
+    else otpRefs.current[5]?.blur();
   }
 
   function handleOtpKeyDown(i: number, e: React.KeyboardEvent<HTMLInputElement>) {
@@ -268,6 +296,7 @@ export default function LoginPage() {
                     maxLength={1}
                     value={digit}
                     onChange={(e) => handleOtpChange(i, e.target.value)}
+                    onPaste={(e) => handleOtpPaste(i, e)}
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     className="h-12 w-10 rounded-xl border border-[#bfcab7]/40 bg-white text-center font-mono text-lg font-bold text-[#191c1d] outline-none transition-colors focus:border-[#004900] focus:ring-2 focus:ring-[#004900]/10"
                   />

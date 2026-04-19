@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import {
-  getTurf, previewPrice, createBooking, initiatePayment,
-  submitPaymentCallback, getMyTeams, getMe,
+  getTurf, previewPrice, createBooking, initiateUpiPayment, submitUpiUtr,
+  getMyTeams, getMe,
+  type UpiInitiateResponse,
 } from "@/lib/api";
 import type { BookingType, PriceBreakdown, TeamRead, TurfRead, UserRead } from "@/types";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
@@ -26,8 +28,11 @@ function BookingContent() {
 
   const turfId = params.turf_id;
   const bookingDate = searchParams.get("date") ?? "";
-  const startTime = (searchParams.get("start") ?? "") + ":00";
-  const endTime = (searchParams.get("end") ?? "") + ":00";
+  const rawStart = searchParams.get("start") ?? "";
+  const rawEnd = searchParams.get("end") ?? "";
+  // Accept both HH:MM and HH:MM:SS — backend expects HH:MM:SS
+  const startTime = rawStart.length === 5 ? `${rawStart}:00` : rawStart;
+  const endTime = rawEnd.length === 5 ? `${rawEnd}:00` : rawEnd;
 
   const [turf, setTurf] = useState<TurfRead | null>(null);
   const [user, setUser] = useState<UserRead | null>(null);
@@ -41,7 +46,11 @@ function BookingContent() {
   const [loadingInit, setLoadingInit] = useState(true);
   const [loadingPrice, setLoadingPrice] = useState(false);
   const [paying, setPaying] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "success" | "failed">("idle");
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "qr" | "submitted" | "success" | "failed">("idle");
+  const [upiPayment, setUpiPayment] = useState<UpiInitiateResponse | null>(null);
+  const [utr, setUtr] = useState("");
+  const [utrError, setUtrError] = useState<string | null>(null);
+  const [submittingUtr, setSubmittingUtr] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPrice = useCallback(async (coupon?: string) => {
@@ -92,10 +101,9 @@ function BookingContent() {
     if (!turfId || !breakdown) return;
     setError(null);
     setPaying(true);
-    setPaymentStatus("pending");
 
     try {
-      // 1. Create booking
+      // 1. Create booking (status=pending)
       const booking = await createBooking({
         turf_id: turfId,
         booking_date: bookingDate,
@@ -107,55 +115,36 @@ function BookingContent() {
         notes: notes || null,
       });
 
-      // 2. Initiate payment (get Razorpay order)
-      const payment = await initiatePayment(booking.id);
-
-      // 3. Open Razorpay checkout
-      const RazorpayClass = window.Razorpay;
-      if (!RazorpayClass) {
-        throw new Error("Payment SDK not loaded. Please refresh and try again.");
-      }
-
-      const rzp = new RazorpayClass({
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "",
-        amount: payment.amount * 100, // paise
-        currency: payment.currency,
-        order_id: payment.gateway_order_id ?? "",
-        name: "Signal Shift",
-        description: `Booking at ${turf?.name}`,
-        prefill: {
-          name: user?.full_name,
-          email: user?.email,
-          contact: user?.phone ?? undefined,
-        },
-        theme: { color: "#004900" },
-        handler: async (response) => {
-          try {
-            // 4. Verify payment on backend
-            await submitPaymentCallback(response);
-            setPaymentStatus("success");
-            setTimeout(() => router.push("/bookings"), 1500);
-          } catch {
-            setPaymentStatus("failed");
-            setError("Payment verification failed. Please contact support with your booking ID: " + booking.id);
-          }
-        },
-        modal: {
-          ondismiss: () => {
-            setPaymentStatus("idle");
-            setPaying(false);
-            setError("Payment was cancelled. Your slot is held for 10 minutes.");
-          },
-        },
-      });
-
-      rzp.open();
+      // 2. Initiate UPI payment → returns the deep-link URI for QR
+      const payment = await initiateUpiPayment(booking.id);
+      setUpiPayment(payment);
+      setPaymentStatus("qr");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Booking failed. Please try again.";
       setError(msg);
       setPaymentStatus("failed");
     } finally {
       setPaying(false);
+    }
+  }
+
+  async function handleSubmitUtr() {
+    if (!upiPayment) return;
+    const cleaned = utr.trim();
+    if (!/^\d{8,22}$/.test(cleaned)) {
+      setUtrError("Enter the UPI reference number (8–22 digits) shown in your UPI app after payment.");
+      return;
+    }
+    setUtrError(null);
+    setSubmittingUtr(true);
+    try {
+      await submitUpiUtr(upiPayment.payment_id, cleaned);
+      setPaymentStatus("submitted");
+      setTimeout(() => router.push("/bookings"), 2000);
+    } catch (err) {
+      setUtrError(err instanceof Error ? err.message : "Failed to submit UTR.");
+    } finally {
+      setSubmittingUtr(false);
     }
   }
 
@@ -178,6 +167,90 @@ function BookingContent() {
         </div>
         <h2 className="text-xl font-bold text-[#191c1d]">Booking Confirmed!</h2>
         <p className="text-sm text-[#707a6a]">Redirecting to your bookings...</p>
+      </div>
+    );
+  }
+
+  if (paymentStatus === "submitted") {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 px-4 text-center animate-fade-in">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-50">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-[#191c1d]">Payment submitted</h2>
+        <p className="text-sm text-[#707a6a]">
+          We&rsquo;ve received your UPI reference. Your booking will be confirmed once the admin verifies the transfer (usually within a few minutes).
+        </p>
+        <p className="text-xs text-[#707a6a]">Taking you to your bookings…</p>
+      </div>
+    );
+  }
+
+  if (paymentStatus === "qr" && upiPayment) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-8">
+        <button onClick={() => { setPaymentStatus("idle"); setUpiPayment(null); }} className="mb-6 flex items-center gap-1.5 text-xs text-[#707a6a] hover:text-[#191c1d]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
+          Back
+        </button>
+
+        <div className="glass-card p-6 text-center animate-fade-in">
+          <h2 className="mb-1 text-lg font-bold text-[#191c1d]">Pay via UPI</h2>
+          <p className="mb-5 text-xs text-[#707a6a]">
+            Scan the QR in any UPI app or tap the button below on mobile.
+          </p>
+
+          <div className="mx-auto mb-4 inline-block rounded-2xl bg-white p-4 ring-1 ring-[#bfcab7]/40">
+            <QRCodeSVG value={upiPayment.upi_uri} size={220} level="M" includeMargin={false} />
+          </div>
+
+          <div className="mb-4 flex flex-col gap-1 text-sm">
+            <div className="flex items-center justify-center gap-2 text-[#404a3b]">
+              <span>Paying to</span>
+              <span className="font-semibold text-[#191c1d]">{upiPayment.payee_name}</span>
+            </div>
+            <div className="font-mono text-xs text-[#707a6a]">{upiPayment.upi_vpa}</div>
+            <div className="mt-2 text-2xl font-bold text-[#004900]">
+              {formatCurrency(upiPayment.amount)}
+            </div>
+          </div>
+
+          <a
+            href={upiPayment.upi_uri}
+            className="mb-5 inline-block w-full rounded-full bg-[#b2f746] px-5 py-3 text-sm font-bold text-[#121f00] shadow-lg shadow-[#004900]/10 transition-all hover:scale-[1.01] active:scale-95 sm:hidden"
+          >
+            Open in UPI app
+          </a>
+
+          <div className="border-t border-[#bfcab7]/30 pt-5">
+            <h3 className="mb-1 text-sm font-semibold text-[#191c1d]">After paying</h3>
+            <p className="mb-3 text-xs text-[#707a6a]">
+              Your UPI app shows a 12-digit <span className="font-semibold">UPI reference number</span> (sometimes called UTR). Paste it here to confirm.
+            </p>
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="e.g. 412345678901"
+              value={utr}
+              onChange={(e) => { setUtr(e.target.value); setUtrError(null); }}
+              className="mb-2 w-full rounded-xl border border-[#bfcab7]/40 bg-white px-3 py-3 text-center font-mono text-base tracking-wider text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-[#004900]/50 focus:ring-2 focus:ring-[#004900]/10"
+            />
+            {utrError && <p className="mb-2 text-xs text-red-700">{utrError}</p>}
+            <button
+              onClick={handleSubmitUtr}
+              disabled={submittingUtr || utr.trim().length < 8}
+              className="w-full rounded-full bg-[#004900] px-5 py-3 text-sm font-bold text-white shadow-lg transition-all hover:bg-[#006400] disabled:opacity-50"
+            >
+              {submittingUtr ? "Submitting…" : "Submit UPI reference"}
+            </button>
+          </div>
+
+          <p className="mt-4 text-[11px] text-[#707a6a]">
+            Your slot is held while we verify the payment.
+          </p>
+        </div>
       </div>
     );
   }
@@ -311,10 +384,27 @@ function BookingContent() {
         <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
+      {/* Phone required gate */}
+      {!user?.phone && (
+        <div className="mb-4 rounded-xl border border-amber-400/40 bg-amber-50 p-4">
+          <p className="mb-2 text-sm font-semibold text-amber-900">Phone number required</p>
+          <p className="mb-3 text-xs text-amber-800">
+            We need your phone number to contact you about this booking. Please add it to your profile.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push(`/profile?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname + window.location.search : "/")}`)}
+            className="rounded-full bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-amber-700"
+          >
+            Add phone to profile →
+          </button>
+        </div>
+      )}
+
       {/* Pay button */}
       <button
         onClick={handlePay}
-        disabled={paying || loadingInit || !breakdown}
+        disabled={paying || loadingInit || !breakdown || !user?.phone}
         className="flex w-full items-center justify-center gap-2 bg-[#b2f746] text-[#121f00] rounded-full font-bold shadow-xl shadow-[#004900]/10 hover:scale-[1.02] active:scale-95 transition-all py-4 text-base disabled:opacity-50"
       >
         {paying ? (
@@ -323,11 +413,11 @@ function BookingContent() {
             Processing...
           </>
         ) : (
-          `Pay ${breakdown ? formatCurrency(breakdown.total) : "..."}`
+          `Pay ${breakdown ? formatCurrency(breakdown.total) : "..."} via UPI`
         )}
       </button>
       <p className="mt-2 text-center text-xs text-[#707a6a]">
-        Powered by Razorpay · Secure payment
+        Secure UPI payment · Booking held for verification
       </p>
     </div>
   );

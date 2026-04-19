@@ -10,6 +10,7 @@ import SlotCalendar from "@/components/turfs/SlotCalendar";
 import SlotGrid, { SlotGridSkeleton } from "@/components/turfs/SlotGrid";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import { formatCurrency, toDateString, addDays, formatDate } from "@/lib/utils";
+import { MAX_SLOTS_PER_BOOKING, summarize, toggleSlot } from "@/lib/slotSelection";
 
 const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
@@ -22,10 +23,13 @@ function TurfDetailContent() {
   const [availabilityRange, setAvailabilityRange] = useState<Record<string, AvailableSlot[]>>({});
   const [selectedDate, setSelectedDate] = useState(toDateString(new Date()));
   const [daySlots, setDaySlots] = useState<AvailableSlot[]>([]);
-  const [selectedSlot, setSelectedSlot] = useState<AvailableSlot | null>(null);
+  const [selectedSlots, setSelectedSlots] = useState<AvailableSlot[]>([]);
+  const [maxWarning, setMaxWarning] = useState(false);
   const [loadingTurf, setLoadingTurf] = useState(true);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const summary = summarize(selectedSlots);
 
   // Load turf + 14-day availability range
   useEffect(() => {
@@ -49,7 +53,8 @@ function TurfDetailContent() {
 
   async function handleSelectDate(date: string) {
     setSelectedDate(date);
-    setSelectedSlot(null);
+    setSelectedSlots([]);
+    setMaxWarning(false);
 
     if (availabilityRange[date] !== undefined) {
       setDaySlots(availabilityRange[date]);
@@ -68,13 +73,24 @@ function TurfDetailContent() {
     }
   }
 
+  function handleToggleSlot(slot: AvailableSlot) {
+    const result = toggleSlot(selectedSlots, slot);
+    setSelectedSlots(result.slots);
+    if (result.reason === "max_reached") {
+      setMaxWarning(true);
+      setTimeout(() => setMaxWarning(false), 2500);
+    } else {
+      setMaxWarning(false);
+    }
+  }
+
   function handleBook() {
-    if (!selectedSlot || !turfId) return;
+    if (!summary || !turfId) return;
     const params = new URLSearchParams({
-      date: selectedSlot.date,
-      start: selectedSlot.start_time,
-      end: selectedSlot.end_time,
-      price: String(selectedSlot.computed_price || selectedSlot.base_price),
+      date: summary.date,
+      start: summary.start_time,
+      end: summary.end_time,
+      price: String(summary.total_price),
     });
     const target = `/book/${turfId}?${params}`;
     if (!getToken()) {
@@ -175,7 +191,7 @@ function TurfDetailContent() {
             onSelectDate={handleSelectDate}
           />
 
-          {/* Selected date label */}
+          {/* Selected date label + helper */}
           <div className="my-4 flex items-center justify-between">
             <p className="text-sm font-medium text-[#404a3b]">
               {formatDate(selectedDate)}
@@ -185,31 +201,43 @@ function TurfDetailContent() {
             </p>
           </div>
 
+          <p className="mb-3 text-xs text-[#707a6a]">
+            Tap up to <span className="font-semibold text-[#191c1d]">{MAX_SLOTS_PER_BOOKING}</span> consecutive slots to extend your booking.
+          </p>
+
           {/* Slot grid */}
           {loadingSlots ? (
             <SlotGridSkeleton />
           ) : (
             <SlotGrid
               slots={daySlots}
-              selectedSlot={selectedSlot}
-              onSelectSlot={setSelectedSlot}
+              selectedSlots={selectedSlots}
+              onToggleSlot={handleToggleSlot}
             />
+          )}
+
+          {maxWarning && (
+            <div className="mt-4 rounded-lg border border-amber-400/40 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+              Maximum {MAX_SLOTS_PER_BOOKING} slots per booking.
+            </div>
           )}
         </div>
       )}
 
       {/* Sticky booking CTA (mobile) */}
-      {selectedSlot && (
+      {summary && (
         <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-[#bfcab7]/20 bg-white/95 px-4 py-3 backdrop-blur-xl md:hidden animate-slide-up">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs text-[#707a6a]">{formatDate(selectedSlot.date)}</p>
+              <p className="text-xs text-[#707a6a]">
+                {formatDate(summary.date)} · {summary.count} slot{summary.count > 1 ? "s" : ""}
+              </p>
               <p className="text-sm font-semibold text-[#191c1d] font-mono">
-                {selectedSlot.start_time.slice(0,5)} – {selectedSlot.end_time.slice(0,5)}
+                {summary.start_time.slice(0, 5)} – {summary.end_time.slice(0, 5)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-lg font-bold text-[#004900]">{formatCurrency(selectedSlot.computed_price || selectedSlot.base_price)}</p>
+              <p className="text-lg font-bold text-[#004900]">{formatCurrency(summary.total_price)}</p>
             </div>
             <button
               onClick={handleBook}
@@ -222,16 +250,18 @@ function TurfDetailContent() {
       )}
 
       {/* Desktop CTA */}
-      {selectedSlot && (
+      {summary && (
         <div className="mt-4 hidden md:flex items-center justify-between rounded-xl border border-[#004900]/15 bg-[#004900]/5 px-5 py-4 animate-fade-in">
           <div>
-            <p className="text-sm text-[#707a6a]">{formatDate(selectedSlot.date)} · {selectedSlot.duration_mins} min</p>
+            <p className="text-sm text-[#707a6a]">
+              {formatDate(summary.date)} · {summary.count} slot{summary.count > 1 ? "s" : ""} · {summary.duration_mins} min
+            </p>
             <p className="font-mono text-base font-semibold text-[#191c1d]">
-              {selectedSlot.start_time.slice(0,5)} – {selectedSlot.end_time.slice(0,5)}
+              {summary.start_time.slice(0, 5)} – {summary.end_time.slice(0, 5)}
             </p>
           </div>
           <div className="text-right mr-4">
-            <p className="text-2xl font-bold text-[#004900]">{formatCurrency(selectedSlot.computed_price || selectedSlot.base_price)}</p>
+            <p className="text-2xl font-bold text-[#004900]">{formatCurrency(summary.total_price)}</p>
           </div>
           <button
             onClick={handleBook}

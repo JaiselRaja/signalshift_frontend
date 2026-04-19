@@ -351,6 +351,24 @@ export async function submitPaymentCallback(body: RazorpayResponse) {
   });
 }
 
+export interface UpiInitiateResponse {
+  payment_id: string;
+  booking_id: string;
+  amount: number;
+  currency: string;
+  upi_uri: string;
+  upi_vpa: string;
+  payee_name: string;
+}
+
+export async function initiateUpiPayment(bookingId: string) {
+  return api.post<UpiInitiateResponse>("/payments/upi/initiate", { booking_id: bookingId });
+}
+
+export async function submitUpiUtr(paymentId: string, utr: string) {
+  return api.post<PaymentRead>("/payments/upi/submit-utr", { payment_id: paymentId, utr });
+}
+
 // ─── Tournaments ──────────────────────────────────────────────────────────────
 
 export async function listTournaments(status?: string) {

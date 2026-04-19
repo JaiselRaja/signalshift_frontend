@@ -15,6 +15,7 @@ function ProfileContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showPhonePrompt, setShowPhonePrompt] = useState(false);
 
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -25,19 +26,35 @@ function ProfileContent() {
         setUser(u);
         setFullName(u.full_name ?? "");
         setPhone(u.phone ?? "");
+        if (!u.phone || !u.phone.trim()) {
+          setShowPhonePrompt(true);
+        }
       })
       .catch(() => setError("Failed to load profile."))
       .finally(() => setLoading(false));
   }, []);
 
+  function startEditingPhone() {
+    setShowPhonePrompt(false);
+    setEditing(true);
+    setTimeout(() => {
+      document.getElementById("profile-phone-input")?.focus();
+    }, 50);
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
+    const trimmedPhone = phone.trim();
+    if (!/^\+?[0-9]{10,15}$/.test(trimmedPhone)) {
+      setError("Please enter a valid phone number (10–15 digits).");
+      return;
+    }
     setSaving(true);
     setError(null);
     setSuccess(false);
     try {
-      const updated = await updateMe({ full_name: fullName.trim(), phone: phone.trim() || undefined });
+      const updated = await updateMe({ full_name: fullName.trim(), phone: trimmedPhone });
       setUser(updated);
       setEditing(false);
       setSuccess(true);
@@ -108,14 +125,21 @@ function ProfileContent() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[#707a6a]">Phone</label>
+              <label className="mb-1.5 flex items-center gap-1 text-xs font-medium uppercase tracking-wider text-[#707a6a]">
+                Phone
+                <span className="text-red-500" aria-label="required">*</span>
+              </label>
               <input
+                id="profile-phone-input"
                 type="tel"
+                inputMode="tel"
+                required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 98765 43210"
                 className="w-full rounded-lg border border-[#bfcab7]/30 bg-white px-3 py-2.5 text-sm text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-[#004900]/40"
               />
+              <p className="mt-1 text-[11px] text-[#707a6a]">Required — we need this to contact you about bookings.</p>
             </div>
             {error && <p className="text-xs text-red-700">{error}</p>}
             <div className="flex gap-3 pt-1">
@@ -177,6 +201,41 @@ function ProfileContent() {
           Sign Out
         </button>
       </div>
+
+      {/* Missing-phone prompt modal */}
+      {showPhonePrompt && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 backdrop-blur-sm sm:items-center"
+        >
+          <div className="w-full max-w-sm animate-fade-in rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+            </div>
+            <h3 className="mb-1 text-center text-lg font-bold text-[#191c1d]">Add your phone number</h3>
+            <p className="mb-5 text-center text-sm text-[#707a6a]">
+              We need your phone number to contact you about bookings and to notify you when your payment is verified.
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={startEditingPhone}
+                className="w-full rounded-full bg-[#004900] py-3 text-sm font-bold text-white shadow-lg transition-all hover:bg-[#006400]"
+              >
+                Add phone number
+              </button>
+              <button
+                onClick={() => setShowPhonePrompt(false)}
+                className="w-full rounded-full border border-[#bfcab7]/40 bg-white py-3 text-sm font-medium text-[#707a6a] hover:bg-[#f3f4f5]"
+              >
+                Remind me later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

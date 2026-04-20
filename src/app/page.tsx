@@ -117,124 +117,84 @@ export default function LandingPage() {
       </section>
 
       {/* ───── Why Signal Shift Matters (Bento Grid) ───── */}
-      <section className="bg-[#f8f9fa] px-6 py-24">
+      <section className="relative bg-[#0a0b0c] px-6 py-24">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <h2 className="font-[family-name:var(--font-headline)] text-4xl md:text-5xl font-extrabold text-[#004900] mb-4">
+          <div className="mb-16 text-center">
+            <p className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.3em] text-[#b2f746]">
+              · The Difference ·
+            </p>
+            <h2 className="font-display text-4xl font-black tracking-tight text-white md:text-5xl">
               Why Signal Shift Matters
             </h2>
-            <p className="text-[#404a3b] text-lg max-w-2xl mx-auto">
+            <p className="mt-4 text-lg text-white/60">
               Everything you need for the perfect game, all in one place.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[300px]">
+          <div className="grid auto-rows-[300px] grid-cols-1 gap-6 md:grid-cols-12">
             {/* Card 1 — Instant Booking */}
-            <div className="md:col-span-7 bg-[#f3f4f5] rounded-2xl p-10 flex flex-col justify-between">
+            <div className="flex flex-col justify-between rounded-3xl border border-white/[0.06] bg-white/[0.03] p-10 md:col-span-7">
               <div>
                 <div className="mb-4">
-                  <svg
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#004900"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  >
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#b2f746" strokeWidth="1.8" strokeLinecap="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" />
                     <line x1="16" y1="2" x2="16" y2="6" />
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
                 </div>
-                <h3 className="font-[family-name:var(--font-headline)] text-2xl font-extrabold text-[#004900] mb-2">
-                  Instant Booking
-                </h3>
-                <p className="text-[#404a3b] text-base leading-relaxed max-w-md">
-                  No phone calls, no waiting. Browse real-time availability and
-                  book your preferred slot in seconds.
+                <h3 className="mb-2 font-display text-2xl font-black text-white">Instant Booking</h3>
+                <p className="max-w-md text-base leading-relaxed text-white/60">
+                  No phone calls, no waiting. Browse real-time availability and book your preferred slot in seconds.
                 </p>
               </div>
             </div>
 
             {/* Card 2 — Safe for All */}
-            <div className="md:col-span-5 bg-[#006400] rounded-2xl p-10 text-white flex flex-col justify-between">
+            <div className="flex flex-col justify-between rounded-3xl bg-[#004900] p-10 text-white md:col-span-5">
               <div>
                 <div className="mb-4">
-                  <svg
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  >
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#b2f746" strokeWidth="1.8" strokeLinecap="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   </svg>
                 </div>
-                <h3 className="font-[family-name:var(--font-headline)] text-2xl font-extrabold mb-2">
-                  Safe for All
-                </h3>
-                <p className="text-white/80 text-base leading-relaxed">
-                  Designed for all sports and all ages. Safe, clean, and
-                  well-maintained facilities for everyone.
+                <h3 className="mb-2 font-display text-2xl font-black">Safe for All</h3>
+                <p className="text-base leading-relaxed text-white/80">
+                  Designed for all sports and all ages. Safe, clean, and well-maintained facilities for everyone.
                 </p>
               </div>
             </div>
 
-            {/* Card 3 — Pro Performance */}
-            <div className="md:col-span-5 bg-[#b2f746] rounded-2xl p-10 flex flex-col justify-between">
-              <div>
+            {/* Card 3 — Pro Performance (the visual anchor) */}
+            <div className="relative flex flex-col justify-between overflow-hidden rounded-3xl bg-[#b2f746] p-10 md:col-span-5">
+              <div className="grain-overlay pointer-events-none absolute inset-0" />
+              <div className="relative">
                 <div className="mb-4">
-                  <svg
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#004900"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  >
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#121f00" strokeWidth="2" strokeLinecap="round">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                   </svg>
                 </div>
-                <h3 className="font-[family-name:var(--font-headline)] text-2xl font-extrabold text-[#004900] mb-2">
-                  Pro Performance
-                </h3>
-                <p className="text-[#2d3a1e] text-base leading-relaxed">
-                  Competition-grade surface that delivers consistent ball roll
-                  and player safety.
+                <h3 className="mb-2 font-display text-2xl font-black text-[#121f00]">Pro Performance</h3>
+                <p className="text-base leading-relaxed text-[#121f00]/80">
+                  Competition-grade surface that delivers consistent ball roll and player safety.
                 </p>
               </div>
             </div>
 
             {/* Card 4 — Teams & Tournaments */}
-            <div className="md:col-span-7 bg-[#e7e8e9] rounded-2xl p-10 flex flex-col justify-between">
+            <div className="flex flex-col justify-between rounded-3xl border border-white/[0.06] bg-white/[0.03] p-10 md:col-span-7">
               <div>
                 <div className="mb-4">
-                  <svg
-                    width="32"
-                    height="32"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#004900"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  >
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#b2f746" strokeWidth="1.8" strokeLinecap="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
                 </div>
-                <h3 className="font-[family-name:var(--font-headline)] text-2xl font-extrabold text-[#004900] mb-2">
-                  Teams & Tournaments
-                </h3>
-                <p className="text-[#404a3b] text-base leading-relaxed max-w-md">
-                  Create teams, add players, and join leagues. Organize
-                  tournaments and track standings all in one place.
+                <h3 className="mb-2 font-display text-2xl font-black text-white">Teams &amp; Tournaments</h3>
+                <p className="max-w-md text-base leading-relaxed text-white/60">
+                  Create teams, add players, and join leagues. Organize tournaments and track standings all in one place.
                 </p>
               </div>
             </div>
@@ -243,35 +203,33 @@ export default function LandingPage() {
       </section>
 
       {/* ───── Booking Action Bar ───── */}
-      <section className="bg-white px-6 py-12">
+      <section className="bg-[#0a0b0c] px-6 py-12">
         <div className="mx-auto max-w-7xl">
-          <div className="bg-[#edeeef] rounded-xl p-8 flex flex-col lg:flex-row items-center justify-between gap-8 border border-[#bfcab7]/15">
-            {/* Left — avatars + info */}
+          <div className="flex flex-col items-center justify-between gap-8 rounded-3xl border border-white/[0.06] bg-white/[0.03] p-8 lg:flex-row">
             <div className="flex items-center gap-4">
               <div className="flex -space-x-4">
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className="h-10 w-10 rounded-full bg-[#004900] border-2 border-white flex items-center justify-center text-white text-xs font-bold"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0b0c] bg-[#b2f746] text-xs font-black text-[#121f00]"
                   >
                     {String.fromCharCode(64 + i)}
                   </div>
                 ))}
               </div>
               <div>
-                <p className="font-bold text-[#004900] text-base">
+                <p className="font-display text-base font-black text-white">
                   Next Available: Today, 6:00 PM
                 </p>
-                <p className="text-[#404a3b] text-sm">
+                <p className="text-sm text-white/60">
                   Book your next slot before it fills up
                 </p>
               </div>
             </div>
 
-            {/* Right — CTA */}
             <Link
               href="/login"
-              className="bg-[#004900] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#003700] transition-colors text-center whitespace-nowrap"
+              className="whitespace-nowrap rounded-full bg-[#b2f746] px-8 py-3 text-center text-sm font-bold text-[#121f00] shadow-lg shadow-[#b2f746]/10 transition-transform hover:scale-[1.03]"
             >
               Book Now
             </Link>
@@ -280,34 +238,36 @@ export default function LandingPage() {
       </section>
 
       {/* ───── Player Voices (Testimonials) ───── */}
-      <section className="py-24 bg-[#f8f9fa] px-6">
+      <section className="bg-[#0a0b0c] px-6 py-24">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <h2 className="font-[family-name:var(--font-headline)] text-4xl md:text-5xl font-extrabold text-[#004900] mb-4">
+          <div className="mb-16 text-center">
+            <p className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.3em] text-[#b2f746]">
+              · Voices from the Field ·
+            </p>
+            <h2 className="font-display text-4xl font-black tracking-tight text-white md:text-5xl">
               Player Voices
             </h2>
-            <div className="w-24 h-1.5 bg-[#b2f746] mx-auto rounded-full" />
+            <div className="mx-auto mt-4 h-1 w-24 rounded-full bg-[#b2f746]" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {TESTIMONIALS.map((t) => (
               <div
                 key={t.name}
-                className={`rounded-2xl p-8 ${
+                className={`rounded-3xl p-8 transition-all hover:-translate-y-1 ${
                   t.highlighted
-                    ? "bg-[#004900] text-white"
-                    : "bg-white shadow-lg shadow-black/5 border border-gray-100"
+                    ? "bg-[#b2f746] text-[#121f00] shadow-[0_24px_60px_-24px_rgba(178,247,70,0.35)]"
+                    : "border border-white/[0.06] bg-white/[0.03] text-white"
                 }`}
               >
-                {/* Stars */}
-                <div className="flex gap-1 mb-6">
+                <div className="mb-6 flex gap-1">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <svg
                       key={s}
                       width="18"
                       height="18"
                       viewBox="0 0 24 24"
-                      fill={t.highlighted ? "#b2f746" : "#f59e0b"}
+                      fill={t.highlighted ? "#121f00" : "#b2f746"}
                       stroke="none"
                     >
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -315,41 +275,23 @@ export default function LandingPage() {
                   ))}
                 </div>
 
-                <p
-                  className={`text-base leading-relaxed mb-8 ${
-                    t.highlighted ? "text-white/90" : "text-[#404a3b]"
-                  }`}
-                >
+                <p className={`mb-8 text-base leading-relaxed ${t.highlighted ? "text-[#121f00]/80" : "text-white/70"}`}>
                   &ldquo;{t.quote}&rdquo;
                 </p>
 
-                {/* Avatar + name */}
                 <div className="flex items-center gap-3">
                   <div
-                    className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                      t.highlighted
-                        ? "bg-[#b2f746] text-[#004900]"
-                        : "bg-[#004900] text-white"
+                    className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-black ${
+                      t.highlighted ? "bg-[#121f00] text-[#b2f746]" : "bg-[#b2f746] text-[#121f00]"
                     }`}
                   >
-                    {t.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
+                    {t.name.split(" ").map((n) => n[0]).join("")}
                   </div>
                   <div>
-                    <p
-                      className={`font-bold text-sm ${
-                        t.highlighted ? "text-white" : "text-[#004900]"
-                      }`}
-                    >
+                    <p className={`font-display text-sm font-bold ${t.highlighted ? "text-[#121f00]" : "text-white"}`}>
                       {t.name}
                     </p>
-                    <p
-                      className={`text-xs ${
-                        t.highlighted ? "text-white/60" : "text-[#404a3b]"
-                      }`}
-                    >
+                    <p className={`text-xs ${t.highlighted ? "text-[#121f00]/60" : "text-white/50"}`}>
                       {t.role}
                     </p>
                   </div>

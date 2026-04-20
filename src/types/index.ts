@@ -27,7 +27,7 @@ export interface UserRead {
 export interface UserUpdate {
   full_name?: string;
   phone?: string;
-  avatar_url?: string;
+  avatar_url?: string | null;
   preferences?: Record<string, unknown>;
 }
 
@@ -181,6 +181,9 @@ export interface MembershipRead {
   role: TeamMemberRole;
   joined_at: string;
   is_active: boolean;
+  user_name?: string | null;
+  user_email?: string | null;
+  user_avatar_url?: string | null;
 }
 
 // ─── Tournaments ──────────────────────────────────────────────────────────────

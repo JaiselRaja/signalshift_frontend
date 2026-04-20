@@ -48,42 +48,42 @@ export default function CreateTeamForm({ onCreated, onCancel }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="glass-card p-5 animate-fade-in">
-      <h3 className="mb-4 text-sm font-semibold text-[#191c1d]">New Team</h3>
+      <h3 className="mb-4 text-sm font-semibold text-white">New Team</h3>
 
       <div className="flex flex-col gap-3">
         <div>
-          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[#707a6a]">Team Name</label>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-white/50">Team Name</label>
           <input
             type="text"
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder="e.g. FC Warriors"
             required
-            className="w-full rounded-lg border border-[#bfcab7]/30 bg-white px-3 py-2.5 text-sm text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-[#004900]/40"
+            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white placeholder-white/40 outline-none focus:border-[#b2f746]/50 focus:ring-2 focus:ring-[#b2f746]/15"
           />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[#707a6a]">Slug (URL)</label>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-white/50">Slug (URL)</label>
           <input
             type="text"
             value={slug}
             onChange={(e) => { setSlugManual(true); setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")); }}
             placeholder="fc-warriors"
             required
-            className="w-full rounded-lg border border-[#bfcab7]/30 bg-white px-3 py-2.5 text-sm font-mono text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-[#004900]/40"
+            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm font-mono text-white placeholder-white/40 outline-none focus:border-[#b2f746]/50 focus:ring-2 focus:ring-[#b2f746]/15"
           />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[#707a6a]">Sport</label>
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-white/50">Sport</label>
           <select
             value={sportType}
             onChange={(e) => setSportType(e.target.value)}
-            className="w-full rounded-lg border border-[#bfcab7]/30 bg-white px-3 py-2.5 text-sm text-[#191c1d] outline-none focus:border-[#004900]/40"
+            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none focus:border-[#b2f746]/50 focus:ring-2 focus:ring-[#b2f746]/15"
           >
             {SPORT_OPTIONS.map((s) => (
-              <option key={s} value={s} className="bg-white capitalize">{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+              <option key={s} value={s} className="bg-[#0a0b0c] capitalize">{s.charAt(0).toUpperCase() + s.slice(1)}</option>
             ))}
           </select>
         </div>
@@ -96,14 +96,14 @@ export default function CreateTeamForm({ onCreated, onCancel }: Props) {
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="flex-1 rounded-xl border border-[#bfcab7]/20 py-2.5 text-sm font-medium text-[#404a3b] hover:bg-[#f3f4f5] disabled:opacity-50 transition-colors"
+          className="flex-1 rounded-xl border border-white/10 bg-white/[0.03] py-2.5 text-sm font-medium text-white/70 hover:bg-white/[0.06] hover:text-white disabled:opacity-50 transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={!name.trim() || !slug.trim() || submitting}
-          className="flex-1 rounded-xl bg-[#b2f746] py-2.5 text-sm font-bold text-[#121f00] shadow-lg shadow-[#004900]/10 disabled:opacity-50 hover:opacity-90 transition-opacity"
+          className="flex-1 rounded-xl bg-[#b2f746] py-2.5 text-sm font-bold text-[#121f00] shadow-lg shadow-[#b2f746]/20 transition-all hover:bg-white disabled:opacity-50"
         >
           {submitting ? (
             <span className="flex items-center justify-center gap-2">

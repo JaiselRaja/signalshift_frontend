@@ -14,26 +14,28 @@ export default function BookingCard({ booking, turfName, onCancel }: Props) {
   const canCancel = CANCELLABLE_STATUSES.has(booking.status);
 
   return (
-    <div className="glass-card p-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between animate-fade-in">
+    <div className="flex flex-col gap-3 rounded-3xl border border-white/[0.06] bg-white/[0.03] p-5 animate-fade-in sm:flex-row sm:items-start sm:justify-between">
       {/* Left: turf + date/time info */}
-      <div className="flex flex-col gap-1.5 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="font-semibold text-[#191c1d] truncate">{turfName}</p>
+      <div className="flex min-w-0 flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="truncate font-display text-lg font-bold text-white">{turfName}</h3>
           <StatusBadge status={booking.status} />
         </div>
 
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          <span className="text-[#404a3b]">{formatDate(booking.booking_date)}</span>
-          <span className="font-mono text-[#404a3b]">
+          <span className="text-white/70">{formatDate(booking.booking_date)}</span>
+          <span className="font-mono text-white">
             {formatTime(booking.start_time)} – {formatTime(booking.end_time)}
           </span>
-          <span className="text-[#707a6a] text-xs self-center">{booking.duration_mins} min</span>
+          <span className="self-center text-xs text-white/50">{booking.duration_mins} min</span>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-xs text-[#707a6a] capitalize">{booking.booking_type}</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/70">
+            {booking.booking_type}
+          </span>
           {booking.notes && (
-            <span className="text-xs text-[#707a6a] italic truncate max-w-[200px]" title={booking.notes}>
+            <span className="truncate text-xs italic text-white/50 max-w-[200px]" title={booking.notes}>
               {booking.notes}
             </span>
           )}
@@ -41,23 +43,23 @@ export default function BookingCard({ booking, turfName, onCancel }: Props) {
       </div>
 
       {/* Right: price + cancel */}
-      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3 shrink-0">
-        <p className="text-base font-bold text-[#004900]">{formatCurrency(booking.final_price)}</p>
+      <div className="flex shrink-0 items-center justify-between gap-3 sm:flex-col sm:items-end sm:justify-start">
+        <p className="font-display text-xl font-black text-[#b2f746]">{formatCurrency(booking.final_price)}</p>
         {canCancel && onCancel && (
           <button
             onClick={() => onCancel(booking)}
-            className="text-xs text-red-400 hover:text-red-300 border border-red-500/20 rounded-lg px-3 py-1.5 hover:bg-red-500/10 transition-colors"
+            className="rounded-full border border-rose-500/30 px-3.5 py-1.5 text-xs font-semibold text-rose-300 transition-colors hover:bg-rose-500/10 hover:text-rose-200"
           >
             Cancel
           </button>
         )}
         {booking.status === "cancelled" && booking.cancel_reason && (
-          <p className="text-[10px] text-[#707a6a] max-w-[140px] text-right line-clamp-2">
+          <p className="max-w-[140px] text-right text-[10px] text-white/50 line-clamp-2">
             {booking.cancel_reason}
           </p>
         )}
         {booking.refund_amount != null && booking.refund_amount > 0 && (
-          <p className="text-[10px] text-teal-400">
+          <p className="text-[10px] font-medium text-teal-300">
             Refund: {formatCurrency(booking.refund_amount)}
           </p>
         )}

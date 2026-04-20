@@ -421,6 +421,23 @@ export async function getMyTeams() {
   return api.get<TeamRead[]>("/teams/my");
 }
 
+export async function updateTeam(teamId: string, body: { name?: string; logo_url?: string | null; is_active?: boolean }) {
+  return api.patch<TeamRead>(`/teams/${teamId}`, body);
+}
+
+export interface UserSummary {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  role: string;
+}
+
+export async function searchUsers(q: string, limit = 10) {
+  const query = encodeURIComponent(q);
+  return api.get<UserSummary[]>(`/users/search?q=${query}&limit=${limit}`);
+}
+
 export async function getTeam(teamId: string) {
   return api.get<TeamRead>(`/teams/${teamId}`);
 }

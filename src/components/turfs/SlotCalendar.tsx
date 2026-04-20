@@ -43,26 +43,28 @@ export default function SlotCalendar({ availabilityRange, selectedDate, onSelect
           <button
             key={dateStr}
             onClick={() => onSelectDate(dateStr)}
-            className={`flex shrink-0 flex-col items-center gap-1 rounded-xl border px-3 py-2.5 transition-all ${
+            className={`flex shrink-0 flex-col items-center gap-1 rounded-2xl border px-3.5 py-3 transition-all ${
               isSelected
-                ? "border-[#004900]/40 bg-[#004900]/10 text-[#191c1d]"
-                : "border-[#bfcab7]/20 bg-white text-[#404a3b] hover:border-[#bfcab7]/40 hover:bg-[#f3f4f5]"
+                ? "border-[#b2f746] bg-[#b2f746] text-[#121f00] shadow-md shadow-[#b2f746]/20"
+                : "border-white/10 bg-white/[0.03] text-white hover:border-white/20 hover:bg-white/[0.06]"
             }`}
           >
-            <span className={`text-[10px] font-medium uppercase tracking-wider ${isSelected ? "text-[#004900]" : "text-[#707a6a]"}`}>
+            <span className={`text-[10px] font-semibold uppercase tracking-wider ${isSelected ? "text-[#121f00]/80" : "text-white/50"}`}>
               {isToday ? "Today" : DAY_LABELS[d.getDay()]}
             </span>
-            <span className="text-lg font-bold leading-none">{d.getDate()}</span>
-            <span className={`text-[9px] ${isSelected ? "text-[#004900]" : "text-[#707a6a]"}`}>
+            <span className={`font-display text-xl font-black leading-none ${isSelected ? "text-[#121f00]" : "text-white"}`}>
+              {d.getDate()}
+            </span>
+            <span className={`text-[9px] uppercase tracking-wider ${isSelected ? "text-[#121f00]/70" : "text-white/50"}`}>
               {MONTH_LABELS[d.getMonth()]}
             </span>
             {/* Availability dot */}
             <div className={`h-1.5 w-1.5 rounded-full ${
               slots.length === 0
-                ? "bg-transparent"
+                ? isSelected ? "bg-[#121f00]/30" : "bg-white/15"
                 : hasAvailable
-                ? "bg-emerald-400"
-                : "bg-red-400/60"
+                ? isSelected ? "bg-[#121f00]" : "bg-[#b2f746]"
+                : isSelected ? "bg-rose-700" : "bg-rose-400"
             }`} />
           </button>
         );

@@ -56,7 +56,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0b0c]/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           {/* Left: Logo */}
           <Link href="/" className="flex items-center gap-2.5">
@@ -72,25 +72,28 @@ export default function Navbar() {
               alt="Signal Shift"
               width={130}
               height={24}
-              className="h-6 w-auto hidden sm:block"
+              className="h-5 w-auto brightness-0 invert sm:h-6"
             />
           </Link>
 
           {/* Center: Desktop nav links */}
-          <div className="hidden items-center gap-6 md:flex font-[family-name:var(--font-headline)]">
+          <div className="hidden items-center gap-7 md:flex">
             {NAV_LINKS.map((link) => {
               const active = isActive(link.href);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={
+                  className={`relative text-sm font-semibold tracking-wide transition-colors ${
                     active
-                      ? "text-emerald-900 font-extrabold border-b-2 border-lime-400 pb-1"
-                      : "text-emerald-700/70 font-medium hover:text-emerald-900 hover:scale-105 transition-all"
-                  }
+                      ? "text-white"
+                      : "text-white/50 hover:text-white"
+                  }`}
                 >
                   {link.name}
+                  {active && (
+                    <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] rounded-full bg-[#b2f746]" />
+                  )}
                 </Link>
               );
             })}
@@ -100,16 +103,15 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
               <>
-                {/* User avatar — desktop */}
                 <Link
                   href="/profile"
-                  className="hidden md:flex h-9 w-9 items-center justify-center rounded-full bg-emerald-800 text-xs font-bold text-white hover:scale-105 transition-all"
+                  className="hidden h-9 w-9 items-center justify-center rounded-full bg-[#b2f746] text-xs font-black text-[#121f00] transition-transform hover:scale-105 md:flex"
                 >
                   Me
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="hidden md:block text-sm font-medium text-emerald-700/70 hover:text-emerald-900 transition-all font-[family-name:var(--font-headline)]"
+                  className="hidden text-sm font-semibold text-white/50 transition-colors hover:text-white md:block"
                 >
                   Sign Out
                 </button>
@@ -117,7 +119,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="bg-[#b2f746] text-[#121f00] px-8 py-3 rounded-full font-bold text-sm tracking-wide shadow-lg shadow-[#004900]/10 hover:scale-105 active:scale-95 transition-all"
+                className="rounded-full bg-[#b2f746] px-6 py-2.5 text-sm font-bold tracking-wide text-[#121f00] shadow-lg shadow-[#b2f746]/10 transition-transform hover:scale-105 active:scale-95"
               >
                 Book Now
               </Link>
@@ -125,8 +127,9 @@ export default function Navbar() {
 
             {/* Mobile hamburger */}
             <button
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-emerald-800 hover:bg-emerald-50 md:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/[0.06] md:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
               {mobileOpen ? <CloseIcon /> : <MenuIcon />}
             </button>
@@ -137,22 +140,22 @@ export default function Navbar() {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setMobileOpen(false)}>
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <nav
-            className="absolute top-[73px] left-0 right-0 bg-white/95 backdrop-blur-xl px-6 py-5 shadow-lg animate-fade-in"
+            className="absolute left-0 right-0 top-[73px] border-b border-white/[0.06] bg-[#0a0b0c]/95 px-6 py-5 backdrop-blur-xl shadow-xl animate-fade-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex flex-col gap-1 font-[family-name:var(--font-headline)]">
+            <div className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => {
                 const active = isActive(link.href);
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`rounded-lg px-4 py-3 text-sm ${
+                    className={`rounded-lg px-4 py-3 text-sm font-semibold transition-colors ${
                       active
-                        ? "text-emerald-900 font-extrabold bg-lime-50"
-                        : "text-emerald-700/70 font-medium"
+                        ? "bg-[#b2f746]/10 text-[#b2f746]"
+                        : "text-white/60 hover:bg-white/[0.04] hover:text-white"
                     }`}
                     onClick={() => setMobileOpen(false)}
                   >
@@ -160,19 +163,19 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-              <div className="my-2 border-t border-emerald-100" />
+              <div className="my-2 border-t border-white/[0.06]" />
               {isLoggedIn ? (
                 <>
                   <Link
                     href="/profile"
-                    className="rounded-lg px-4 py-3 text-sm font-medium text-emerald-700/70"
+                    className="rounded-lg px-4 py-3 text-sm font-semibold text-white/60 hover:bg-white/[0.04] hover:text-white"
                     onClick={() => setMobileOpen(false)}
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="rounded-lg px-4 py-3 text-left text-sm font-medium text-red-500"
+                    className="rounded-lg px-4 py-3 text-left text-sm font-semibold text-rose-400 hover:bg-rose-500/10"
                   >
                     Sign Out
                   </button>
@@ -180,7 +183,7 @@ export default function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="mt-2 block bg-[#b2f746] text-[#121f00] px-8 py-3 rounded-full font-bold text-sm tracking-wide text-center shadow-lg shadow-[#004900]/10"
+                  className="mt-2 block rounded-full bg-[#b2f746] px-8 py-3 text-center text-sm font-bold tracking-wide text-[#121f00] shadow-lg shadow-[#b2f746]/10"
                   onClick={() => setMobileOpen(false)}
                 >
                   Book Now

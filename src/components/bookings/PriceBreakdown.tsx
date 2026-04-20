@@ -21,14 +21,14 @@ export default function PriceBreakdown({ breakdown, loading }: Props) {
     <div className="flex flex-col gap-1.5 animate-fade-in">
       {/* Base price */}
       <div className="flex justify-between text-sm">
-        <span className="text-[#404a3b]">Base price</span>
-        <span className="text-[#191c1d]">{formatCurrency(breakdown.base_price)}</span>
+        <span className="text-white/70">Base price</span>
+        <span className="text-white">{formatCurrency(breakdown.base_price)}</span>
       </div>
 
       {/* Applied rules */}
       {breakdown.applied_rules?.map((rule, i) => (
         <div key={i} className="flex justify-between text-xs">
-          <span className="text-[#707a6a] capitalize">{rule.rule_name}</span>
+          <span className="text-white/50 capitalize">{rule.rule_name}</span>
           <span className={rule.effect_amount < 0 ? "text-emerald-400" : "text-amber-400"}>
             {rule.effect_amount >= 0 ? "+" : ""}{formatCurrency(rule.effect_amount)}
           </span>
@@ -51,26 +51,26 @@ export default function PriceBreakdown({ breakdown, loading }: Props) {
         </div>
       )}
 
-      <div className="my-1 border-t border-[#bfcab7]/20" />
+      <div className="my-1 border-t border-white/[0.08]" />
 
       {/* Subtotal */}
       <div className="flex justify-between text-sm">
-        <span className="text-[#404a3b]">Subtotal</span>
-        <span className="text-[#191c1d]">{formatCurrency(breakdown.subtotal)}</span>
+        <span className="text-white/70">Subtotal</span>
+        <span className="text-white">{formatCurrency(breakdown.subtotal)}</span>
       </div>
 
       {/* Tax */}
       <div className="flex justify-between text-xs">
-        <span className="text-[#707a6a]">GST (18%)</span>
-        <span className="text-[#707a6a]">{formatCurrency(breakdown.tax)}</span>
+        <span className="text-white/50">GST (18%)</span>
+        <span className="text-white/50">{formatCurrency(breakdown.tax)}</span>
       </div>
 
-      <div className="my-1 border-t border-[#bfcab7]/20" />
+      <div className="my-1 border-t border-white/[0.08]" />
 
       {/* Total */}
       <div className="flex justify-between text-base font-bold">
-        <span className="text-[#191c1d]">Total</span>
-        <span className="gradient-text text-lg">{formatCurrency(breakdown.total)}</span>
+        <span className="text-white">Total</span>
+        <span className="font-display text-lg text-[#b2f746]">{formatCurrency(breakdown.total)}</span>
       </div>
     </div>
   );

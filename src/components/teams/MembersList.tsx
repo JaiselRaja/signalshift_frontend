@@ -9,54 +9,71 @@ type Props = {
 };
 
 const ROLE_STYLES: Record<TeamMemberRole, string> = {
-  manager: "bg-[#004900]/10 text-[#004900] border-[#004900]/15",
-  captain: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  player: "bg-slate-500/10 text-slate-400 border-slate-500/20",
+  manager: "bg-[#b2f746]/15 text-[#b2f746] ring-1 ring-[#b2f746]/30",
+  captain: "bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/30",
+  player: "bg-white/[0.06] text-white/70 ring-1 ring-white/10",
 };
+
+function initials(name?: string | null, email?: string | null): string {
+  if (name && name.trim()) {
+    return name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("") || "??";
+  }
+  if (email) return email.slice(0, 2).toUpperCase();
+  return "??";
+}
 
 export default function MembersList({ members, canManage, onRemove }: Props) {
   if (!members.length) {
-    return <p className="py-4 text-center text-sm text-[#707a6a]">No members yet.</p>;
+    return <p className="py-4 text-center text-sm text-white/50">No members yet.</p>;
   }
 
   return (
     <div className="flex flex-col gap-2">
-      {members.map((m) => (
-        <div
-          key={m.id}
-          className="flex items-center justify-between gap-3 rounded-xl border border-[#bfcab7]/20 bg-white px-4 py-3"
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#004900]/10 text-[#004900] text-xs font-bold">
-              {m.user_id.slice(0, 2).toUpperCase()}
+      {members.map((m) => {
+        const displayName = m.user_name || (m.user_email?.split("@")[0] ?? "Player");
+        const tagline = m.user_email ?? `#${m.user_id.slice(0, 8)}`;
+        return (
+          <div
+            key={m.id}
+            className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3"
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grain-overlay relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-[#b2f746] to-[#86df72] font-display text-xs font-black text-[#121f00]">
+                {m.user_avatar_url ? (
+                  <img src={m.user_avatar_url} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span>{initials(m.user_name, m.user_email)}</span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-white">{displayName}</p>
+                <p className="mt-0.5 truncate text-[11px] text-white/50">{tagline}</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-[#191c1d] truncate font-mono text-xs">
-                {m.user_id}
-              </p>
-              <p className="text-[10px] text-[#707a6a]">
-                Joined {new Date(m.joined_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-              </p>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${ROLE_STYLES[m.role]}`}>
+                {m.role}
+              </span>
+              {canManage && onRemove && m.role !== "manager" && (
+                <button
+                  onClick={() => onRemove(m.user_id)}
+                  className="rounded-lg p-1.5 text-white/40 transition-colors hover:bg-rose-500/10 hover:text-rose-300"
+                  title="Remove member"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium capitalize ${ROLE_STYLES[m.role]}`}>
-              {m.role}
-            </span>
-            {canManage && onRemove && m.role !== "manager" && (
-              <button
-                onClick={() => onRemove(m.user_id)}
-                className="rounded-lg p-1 text-[#707a6a] hover:bg-red-500/10 hover:text-red-400 transition-colors"
-                title="Remove member"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            )}
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

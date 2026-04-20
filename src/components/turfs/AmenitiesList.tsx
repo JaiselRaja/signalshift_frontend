@@ -17,8 +17,8 @@ export default function AmenitiesList({ amenities }: { amenities: Amenity[] }) {
           key={i}
           className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium ${
             a.available === false
-              ? "border-[#bfcab7]/10 text-[#707a6a] line-through"
-              : "border-emerald-500/20 bg-emerald-500/5 text-emerald-400"
+              ? "border-white/10 text-white/40 line-through"
+              : "border-[#b2f746]/30 bg-[#b2f746]/[0.08] text-[#b2f746]"
           }`}
         >
           {a.available !== false && <CheckIcon />}

@@ -1,73 +1,73 @@
 @import "tailwindcss";
 
-/* ═══ Design Tokens — "The Organic Arena" ═══ */
+/* ═══ Design Tokens — "The Arena (Dark)" ═══ */
 :root {
-  /* ─── Surface System (Material Design 3 tonal) ─── */
-  --bg-primary: #f8f9fa;
-  --bg-secondary: #f3f4f5;
-  --bg-card: #ffffff;
-  --bg-elevated: #edeeef;
-  --bg-hover: #e7e8e9;
+  /* ─── Surface System ─── */
+  --bg-primary: #0a0b0c;
+  --bg-secondary: #111213;
+  --bg-card: #17181a;
+  --bg-elevated: #1d1f22;
+  --bg-hover: #242629;
 
-  --surface: #f8f9fa;
-  --surface-container-lowest: #ffffff;
-  --surface-container-low: #f3f4f5;
-  --surface-container: #edeeef;
-  --surface-container-high: #e7e8e9;
-  --surface-container-highest: #e1e3e4;
-  --surface-dim: #d9dadb;
+  --surface: #0a0b0c;
+  --surface-container-lowest: #111213;
+  --surface-container-low: #17181a;
+  --surface-container: #1d1f22;
+  --surface-container-high: #242629;
+  --surface-container-highest: #2c2e32;
+  --surface-dim: #34373b;
 
   /* ─── Brand Colors ─── */
-  --primary: #004900;
-  --primary-container: #006400;
-  --primary-fixed: #9df888;
-  --primary-fixed-dim: #82db6f;
-  --on-primary: #ffffff;
-  --on-primary-container: #86df72;
-  --on-primary-fixed: #002200;
+  --primary: #b2f746;
+  --primary-container: #98da27;
+  --primary-fixed: #b2f746;
+  --primary-fixed-dim: #98da27;
+  --on-primary: #121f00;
+  --on-primary-container: #121f00;
+  --on-primary-fixed: #121f00;
 
-  --secondary: #446900;
-  --secondary-container: #b2f746;
+  --secondary: #86df72;
+  --secondary-container: #004900;
   --secondary-fixed: #b2f746;
   --secondary-fixed-dim: #98da27;
-  --on-secondary: #ffffff;
+  --on-secondary: #002200;
   --on-secondary-fixed: #121f00;
-  --on-secondary-container: #496f00;
+  --on-secondary-container: #b2f746;
 
-  --tertiary: #53372f;
+  --tertiary: #d8b9ae;
   --tertiary-container: #6d4e45;
 
-  --error: #ba1a1a;
-  --error-container: #ffdad6;
+  --error: #ffb4ab;
+  --error-container: #93000a;
 
   /* ─── Text Colors ─── */
-  --text-primary: #191c1d;
-  --text-secondary: #404a3b;
-  --text-muted: #707a6a;
-  --on-surface: #191c1d;
-  --on-surface-variant: #404a3b;
+  --text-primary: #f5f5f4;
+  --text-secondary: #d4d4d1;
+  --text-muted: #8a8a87;
+  --on-surface: #f5f5f4;
+  --on-surface-variant: #d4d4d1;
 
   /* ─── Borders ─── */
-  --border-subtle: rgba(191, 202, 183, 0.15);
-  --border-active: rgba(0, 73, 0, 0.4);
-  --outline: #707a6a;
-  --outline-variant: #bfcab7;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-active: rgba(178, 247, 70, 0.5);
+  --outline: rgba(255, 255, 255, 0.2);
+  --outline-variant: rgba(255, 255, 255, 0.08);
 
   /* ─── Gradients ─── */
-  --gradient-brand: linear-gradient(135deg, #004900 0%, #006400 50%, #82db6f 100%);
-  --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.6) 0%, transparent 100%);
-  --gradient-glow: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 73, 0, 0.04), transparent 40%);
+  --gradient-brand: linear-gradient(135deg, #b2f746 0%, #86df72 50%, #004900 100%);
+  --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+  --gradient-glow: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(178, 247, 70, 0.05), transparent 40%);
 
   /* ─── Glass ─── */
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(191, 202, 183, 0.15);
+  --glass-bg: rgba(23, 24, 26, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
   --glass-blur: 16px;
 
-  /* ─── Shadows (green-tinted, not grey) ─── */
-  --shadow-sm: 0 2px 8px rgba(0, 73, 0, 0.04);
-  --shadow-md: 0 4px 16px rgba(0, 73, 0, 0.06);
-  --shadow-lg: 0 8px 32px rgba(0, 73, 0, 0.08);
-  --shadow-glow: 0 20px 40px rgba(0, 73, 0, 0.08);
+  /* ─── Shadows (deep, rich) ─── */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 20px 60px -20px rgba(178, 247, 70, 0.15);
 
   /* ─── Radius (generous, premium feel) ─── */
   --radius-sm: 0.75rem;
@@ -82,7 +82,7 @@
 /* ═══ Global Base ═══ */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0,73,0,0.15) transparent;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -90,17 +90,123 @@
   height: 6px;
 }
 *::-webkit-scrollbar-thumb {
-  background: rgba(0,73,0,0.15);
+  background: rgba(255,255,255,0.1);
   border-radius: 3px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,73,0,0.25);
+  background: rgba(178,247,70,0.3);
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
+}
+
+/* Native select options — styled where supported (mostly desktop/Firefox) */
+select option {
+  background-color: #17181a;
+  color: #f5f5f4;
+}
+select option:checked {
+  background: linear-gradient(#b2f746, #b2f746);
+  color: #121f00;
+}
+
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+.font-body {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ═══ Sport-themed gradient cards ═══ */
+.sport-bg-football {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(178, 247, 70, 0.25), transparent 55%),
+    linear-gradient(135deg, #0d3a0d 0%, #164f16 40%, #1f6b1f 100%);
+}
+.sport-bg-cricket {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.04) 49%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.04) 51%, rgba(255,255,255,0.04) 100%),
+    linear-gradient(135deg, #8b5e3c 0%, #6d4528 100%);
+}
+.sport-bg-basketball {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.12), transparent 60%),
+    linear-gradient(135deg, #b94a1e 0%, #7a2c10 100%);
+}
+.sport-bg-tennis {
+  background:
+    radial-gradient(circle at 70% 30%, rgba(255,255,255,0.18), transparent 50%),
+    linear-gradient(135deg, #4a7c59 0%, #2d5a3e 100%);
+}
+.sport-bg-badminton {
+  background:
+    linear-gradient(135deg, #1a3a52 0%, #0d2340 100%);
+}
+.sport-bg-default {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(178, 247, 70, 0.2), transparent 50%),
+    linear-gradient(135deg, #004900 0%, #111211 100%);
+}
+
+/* Grainy overlay for editorial feel */
+.grain-overlay {
+  position: relative;
+}
+.grain-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Stagger helper — add style="--i:N" to children */
+.stagger > * {
+  opacity: 0;
+  animation: fadeIn 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* Marquee-style ticker */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker {
+  display: flex;
+  gap: 3rem;
+  width: max-content;
+  animation: ticker 40s linear infinite;
+}
+
+/* Button shimmer on hover */
+.shine::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,0.45) 50%, transparent 60%);
+  transform: translateX(-120%);
+  transition: transform 0.6s ease;
+}
+.shine:hover::before {
+  transform: translateX(120%);
 }
 
 /* ═══ Surface Card (replaces glass-card) ═══ */
@@ -176,7 +282,7 @@ body {
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: var(--surface-container-low);
+  background: rgba(255,255,255,0.04);
   border-radius: var(--radius-md);
 }
 
@@ -184,7 +290,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(0,73,0,0.03), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
   animation: shimmer 1.5s infinite;
 }
 

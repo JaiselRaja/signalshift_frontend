@@ -37,19 +37,61 @@ function SectionHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-4 flex items-end justify-between gap-3">
-      <div className="flex items-baseline gap-3">
-        <h2 className="text-lg font-bold text-[#191c1d] font-[family-name:var(--font-headline)]">
+    <div className="mb-5 flex items-end justify-between gap-3">
+      <div>
+        <h2 className="font-display text-xl font-black tracking-tight text-white md:text-2xl">
           {title}
         </h2>
         {count !== undefined && (
-          <span className="text-xs font-medium text-[#707a6a]">
+          <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">
             {count} {count === 1 ? "item" : "items"}
-          </span>
+          </p>
         )}
       </div>
       {action}
     </div>
+  );
+}
+
+function QuickAction({
+  href,
+  label,
+  icon,
+  highlight = false,
+}: {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  highlight?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`group relative flex flex-col gap-3 rounded-3xl p-5 transition-all hover:-translate-y-0.5 ${
+        highlight
+          ? "bg-[#b2f746] text-[#121f00] shadow-lg shadow-[#b2f746]/10"
+          : "border border-white/[0.06] bg-white/[0.03] text-white hover:border-[#b2f746]/40"
+      }`}
+    >
+      <span
+        className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+          highlight ? "bg-[#121f00]/10 text-[#121f00]" : "bg-[#b2f746]/15 text-[#b2f746]"
+        }`}
+      >
+        {icon}
+      </span>
+      <span className="font-display text-base font-bold leading-tight">{label}</span>
+      <span
+        aria-hidden
+        className={`absolute right-4 top-4 transition-transform group-hover:translate-x-1 ${
+          highlight ? "text-[#121f00]/40" : "text-white/30"
+        }`}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <path d="M5 12h14M13 5l7 7-7 7" />
+        </svg>
+      </span>
+    </Link>
   );
 }
 
@@ -113,17 +155,19 @@ function DashboardContent() {
     return "Good evening";
   })();
 
-  const firstName = me?.full_name?.split(" ")[0] ?? "there";
+  const firstName = me?.full_name?.split(" ")[0] ?? me?.email?.split("@")[0] ?? "there";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 md:px-6">
+    <div className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-12">
       {/* Hero greeting */}
       <div className="mb-8">
-        <p className="text-sm text-[#707a6a]">{greeting},</p>
-        <h1 className="mt-1 text-3xl font-bold text-[#191c1d] md:text-4xl font-[family-name:var(--font-headline)]">
+        <p className="font-mono text-[11px] font-medium uppercase tracking-[0.3em] text-[#b2f746]">
+          · {greeting} ·
+        </p>
+        <h1 className="mt-2 font-display text-4xl font-black leading-[0.95] tracking-tight text-white md:text-5xl">
           {firstName}
         </h1>
-        <p className="mt-2 text-sm text-[#707a6a]">
+        <p className="mt-3 text-sm text-white/60 md:text-base">
           {upcoming.length > 0
             ? `You have ${upcoming.length} upcoming booking${upcoming.length === 1 ? "" : "s"}.`
             : "Ready to book your next match?"}
@@ -131,56 +175,57 @@ function DashboardContent() {
       </div>
 
       {error && (
-        <div className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-6 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
           {error}
         </div>
       )}
 
       {/* Quick actions */}
       <div className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Link
+        <QuickAction
           href="/turfs"
-          className="group flex flex-col gap-2 rounded-2xl bg-[#004900] p-5 text-white transition-all hover:scale-[1.02]"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" className="text-[#b2f746]">
-            <rect x="3" y="4" width="18" height="18" rx="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-          </svg>
-          <span className="text-sm font-semibold">Book a slot</span>
-        </Link>
-        <Link
+          label="Book a slot"
+          highlight
+          icon={
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          }
+        />
+        <QuickAction
           href="/tournaments"
-          className="group flex flex-col gap-2 rounded-2xl bg-white p-5 shadow-sm shadow-[#004900]/5 transition-all hover:scale-[1.02]"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" className="text-[#004900]">
-            <path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4" />
-            <path d="M19 7V4H8" />
-          </svg>
-          <span className="text-sm font-semibold text-[#191c1d]">Tournaments</span>
-        </Link>
-        <Link
+          label="Tournaments"
+          icon={
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4" />
+              <path d="M19 7V4H8" />
+            </svg>
+          }
+        />
+        <QuickAction
           href="/teams"
-          className="group flex flex-col gap-2 rounded-2xl bg-white p-5 shadow-sm shadow-[#004900]/5 transition-all hover:scale-[1.02]"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" className="text-[#004900]">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-          </svg>
-          <span className="text-sm font-semibold text-[#191c1d]">Teams</span>
-        </Link>
-        <Link
+          label="Teams"
+          icon={
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            </svg>
+          }
+        />
+        <QuickAction
           href="/profile"
-          className="group flex flex-col gap-2 rounded-2xl bg-white p-5 shadow-sm shadow-[#004900]/5 transition-all hover:scale-[1.02]"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" className="text-[#004900]">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          <span className="text-sm font-semibold text-[#191c1d]">Profile</span>
-        </Link>
+          label="Profile"
+          icon={
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          }
+        />
       </div>
 
       {/* Upcoming bookings */}
@@ -191,15 +236,15 @@ function DashboardContent() {
           action={
             <Link
               href="/turfs"
-              className="rounded-full bg-[#b2f746] px-4 py-2 text-xs font-bold text-[#121f00] shadow-sm shadow-[#004900]/10 hover:scale-[1.02] transition-all"
+              className="rounded-full bg-[#b2f746] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#121f00] shadow-sm transition-transform hover:scale-[1.03]"
             >
               + New booking
             </Link>
           }
         />
         {upcoming.length === 0 ? (
-          <div className="glass-card flex flex-col items-center gap-3 p-10 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#bfcab7]/15 text-[#707a6a]">
+          <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#b2f746]/10 text-[#b2f746]">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" />
                 <line x1="16" y1="2" x2="16" y2="6" />
@@ -207,10 +252,10 @@ function DashboardContent() {
                 <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
             </div>
-            <p className="text-sm text-[#707a6a]">No upcoming bookings.</p>
+            <p className="text-sm text-white/60">No upcoming bookings.</p>
             <Link
               href="/turfs"
-              className="text-sm font-semibold text-[#004900] hover:text-[#006400]"
+              className="text-xs font-semibold uppercase tracking-wider text-[#b2f746] underline-offset-4 hover:underline"
             >
               Browse turfs →
             </Link>
@@ -237,34 +282,35 @@ function DashboardContent() {
           action={
             <Link
               href="/teams"
-              className="text-xs font-semibold text-[#004900] hover:text-[#006400]"
+              className="text-xs font-semibold uppercase tracking-wider text-[#b2f746] underline-offset-4 hover:underline"
             >
               Browse all teams →
             </Link>
           }
         />
         {teams.length === 0 ? (
-          <div className="glass-card flex flex-col items-center gap-3 p-10 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#bfcab7]/15 text-[#707a6a]">
+          <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#b2f746]/10 text-[#b2f746]">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
               </svg>
             </div>
-            <p className="text-sm text-[#707a6a]">You haven&apos;t joined any teams yet.</p>
+            <p className="text-sm text-white/60">You haven&apos;t joined any teams yet.</p>
             <Link
               href="/teams"
-              className="text-sm font-semibold text-[#004900] hover:text-[#006400]"
+              className="text-xs font-semibold uppercase tracking-wider text-[#b2f746] underline-offset-4 hover:underline"
             >
               Find or create a team →
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {teams.map((team) => (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {teams.map((team, i) => (
               <TeamCard
                 key={team.id}
                 team={team}
+                index={i}
                 onClick={() => router.push(`/teams/${team.slug}?id=${team.id}`)}
               />
             ))}
@@ -280,15 +326,15 @@ function DashboardContent() {
             action={
               <Link
                 href="/turfs"
-                className="text-xs font-semibold text-[#004900] hover:text-[#006400]"
+                className="text-xs font-semibold uppercase tracking-wider text-[#b2f746] underline-offset-4 hover:underline"
               >
                 View all →
               </Link>
             }
           />
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {suggestions.map((turf) => (
-              <TurfCard key={turf.id} turf={turf} />
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {suggestions.map((turf, i) => (
+              <TurfCard key={turf.id} turf={turf} index={i} />
             ))}
           </div>
         </section>
@@ -301,26 +347,21 @@ function DashboardContent() {
             onClick={() => setShowPast(!showPast)}
             className="mb-4 flex w-full items-center justify-between text-left"
           >
-            <div className="flex items-baseline gap-3">
-              <h2 className="text-lg font-bold text-[#191c1d] font-[family-name:var(--font-headline)]">
+            <div>
+              <h2 className="font-display text-xl font-black tracking-tight text-white md:text-2xl">
                 Past bookings
               </h2>
-              <span className="text-xs font-medium text-[#707a6a]">
+              <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/50">
                 {past.length} {past.length === 1 ? "booking" : "bookings"}
-              </span>
+              </p>
             </div>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              className={`text-[#707a6a] transition-transform ${showPast ? "rotate-180" : ""}`}
+            <span
+              className={`flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-white/60 transition-transform ${showPast ? "rotate-180" : ""}`}
             >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
           </button>
           {showPast && (
             <div className="flex flex-col gap-3 animate-fade-in">

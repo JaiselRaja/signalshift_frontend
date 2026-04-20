@@ -45,7 +45,7 @@ export default function SlotGrid({ slots, selectedSlots, onToggleSlot }: Props) 
   if (slots.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-center">
-        <p className="text-sm text-[#707a6a]">No slots configured for this day.</p>
+        <p className="text-sm text-white/50">No slots configured for this day.</p>
       </div>
     );
   }
@@ -74,7 +74,7 @@ function PeriodSection({
 }) {
   return (
     <div>
-      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#707a6a]">{label}</h3>
+      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/50">{label}</h3>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
         {slots.map((slot, i) => (
           <SlotPill
@@ -110,20 +110,20 @@ function SlotPill({
       disabled={disabled}
       onClick={() => !disabled && onToggle()}
       className={[
-        "flex flex-col gap-1 rounded-xl border p-3 text-left transition-all active:scale-[0.98]",
+        "flex flex-col gap-1 rounded-2xl border p-3 text-left transition-all active:scale-[0.98]",
         disabled
-          ? "cursor-not-allowed border-[#bfcab7]/10 bg-[#f3f4f5] opacity-50"
+          ? "cursor-not-allowed border-white/[0.04] bg-white/[0.02] opacity-50"
           : selected
-            ? "border-2 border-[#004900] bg-[#b2f746] text-[#121f00] shadow-md shadow-[#004900]/20 scale-[1.02]"
-            : "border border-[#bfcab7]/30 bg-white hover:border-[#004900]/40 hover:shadow-sm",
+            ? "border-2 border-[#b2f746] bg-[#b2f746] text-[#121f00] shadow-md shadow-[#b2f746]/20 scale-[1.02]"
+            : "border-white/10 bg-white/[0.03] hover:border-[#b2f746]/40 hover:bg-white/[0.05]",
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-1">
         <div className="flex flex-col">
-          <span className={`font-mono text-sm font-semibold leading-tight ${disabled ? "text-[#707a6a] line-through" : selected ? "text-[#121f00]" : "text-[#191c1d]"}`}>
+          <span className={`font-mono text-sm font-semibold leading-tight ${disabled ? "text-white/40 line-through" : selected ? "text-[#121f00]" : "text-white"}`}>
             {formatTime(slot.start_time)}
           </span>
-          <span className={`font-mono text-[10px] ${disabled ? "text-[#707a6a]" : selected ? "text-[#121f00]/80" : "text-[#707a6a]"}`}>
+          <span className={`font-mono text-[10px] ${disabled ? "text-white/30" : selected ? "text-[#121f00]/80" : "text-white/50"}`}>
             → {formatTime(slot.end_time)}
           </span>
         </div>
@@ -135,7 +135,7 @@ function SlotPill({
       </div>
 
       <div className="mt-0.5 flex items-center justify-between gap-1">
-        <span className={`text-[10px] ${disabled ? "text-[#707a6a]" : selected ? "text-[#121f00]/70" : "text-[#707a6a]"}`}>
+        <span className={`text-[10px] ${disabled ? "text-white/30" : selected ? "text-[#121f00]/70" : "text-white/50"}`}>
           {slot.duration_mins}m
         </span>
         {slot.slot_type !== "regular" && (
@@ -145,7 +145,7 @@ function SlotPill({
         )}
       </div>
 
-      <span className={`mt-0.5 text-sm font-bold ${disabled ? "text-[#707a6a]" : selected ? "text-[#121f00]" : "text-[#004900]"}`}>
+      <span className={`mt-0.5 text-sm font-bold ${disabled ? "text-white/40" : selected ? "text-[#121f00]" : "text-[#b2f746]"}`}>
         {baseLabel ?? formatCurrency(price)}
       </span>
     </button>

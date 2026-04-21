@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getToken, getTurf, getTurfAvailabilityRange, getTurfAvailability } from "@/lib/api";
 import type { AvailableSlot, TurfRead } from "@/types";
@@ -280,5 +280,9 @@ function TurfDetailContent() {
 }
 
 export default function TurfDetailPage() {
-  return <TurfDetailContent />;
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <TurfDetailContent />
+    </Suspense>
+  );
 }

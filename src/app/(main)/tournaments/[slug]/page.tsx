@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   getToken, getTournament, getTournamentStandings, getTournamentMatches,
@@ -258,5 +258,9 @@ function TournamentDetailContent() {
 }
 
 export default function TournamentDetailPage() {
-  return <TournamentDetailContent />;
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <TournamentDetailContent />
+    </Suspense>
+  );
 }

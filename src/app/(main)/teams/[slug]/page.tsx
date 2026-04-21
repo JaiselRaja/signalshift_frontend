@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getToken, getTeam, getTeamMembers, addTeamMember, removeTeamMember, updateTeam, getMe } from "@/lib/api";
 import type { MembershipRead, TeamRead, UserRead } from "@/types";
@@ -165,5 +165,9 @@ function TeamDetailContent() {
 }
 
 export default function TeamDetailPage() {
-  return <TeamDetailContent />;
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <TeamDetailContent />
+    </Suspense>
+  );
 }

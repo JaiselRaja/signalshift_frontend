@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -426,7 +426,9 @@ function BookingContent() {
 export default function BookingPage() {
   return (
     <ProtectedRoute>
-      <BookingContent />
+      <Suspense fallback={<PageLoader />}>
+        <BookingContent />
+      </Suspense>
     </ProtectedRoute>
   );
 }

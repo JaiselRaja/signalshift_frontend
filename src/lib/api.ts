@@ -49,25 +49,6 @@ export function getToken(): string | null {
   return accessToken;
 }
 
-/** Sets a placeholder token so protected routes render without a real backend. Development only. */
-export function setPreviewToken() {
-  if (process.env.NODE_ENV !== "development") {
-    console.warn("setPreviewToken() is only available in development mode.");
-    return;
-  }
-  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-  const payload = btoa(
-    JSON.stringify({
-      sub: "preview-user",
-      tenant_id: "preview-tenant",
-      role: "player",
-      exp: Math.floor(Date.now() / 1000) + 3600,
-      preview: true,
-    })
-  );
-  setToken(`${header}.${payload}.preview`);
-}
-
 export function clearToken() {
   accessToken = null;
   if (typeof window !== "undefined") {
@@ -238,19 +219,6 @@ export async function verifyOtp(email: string, otp: string) {
     refresh_token: string;
     expires_in: number;
   }>("/auth/otp/verify", { email, otp, tenant_slug: TENANT_SLUG }, { noAuth: true });
-  setToken(data.access_token);
-  if (typeof window !== "undefined") {
-    localStorage.setItem("ss_refresh_token", data.refresh_token);
-  }
-  return data;
-}
-
-export async function devLogin(email: string, password: string) {
-  const data = await api.post<{
-    access_token: string;
-    refresh_token: string;
-    expires_in: number;
-  }>("/auth/dev-login", { email, password, tenant_slug: TENANT_SLUG }, { noAuth: true });
   setToken(data.access_token);
   if (typeof window !== "undefined") {
     localStorage.setItem("ss_refresh_token", data.refresh_token);

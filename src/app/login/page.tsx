@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { sendOtp, verifyOtp, googleSignIn, devLogin, setPreviewToken, getToken } from "@/lib/api";
+import { sendOtp, verifyOtp, googleSignIn, getToken } from "@/lib/api";
 
 export default function LoginPage() {
   return (
@@ -24,14 +24,10 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendTimer, setResendTimer] = useState(0);
-  const [showDevLogin, setShowDevLogin] = useState(false);
-  const [devEmail, setDevEmail] = useState("");
-  const [devPassword, setDevPassword] = useState("");
 
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const googleBtnRef = useRef<HTMLDivElement>(null);
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
-  const isDev = process.env.NODE_ENV === "development";
 
   // Redirect if already logged in
   useEffect(() => {
@@ -67,21 +63,6 @@ function LoginContent() {
       return () => script?.removeEventListener("load", initGoogle);
     }
   }, [googleClientId, step]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  async function handleDevLogin(e: React.FormEvent) {
-    e.preventDefault();
-    if (!devEmail.trim() || !devPassword.trim()) return;
-    setError(null);
-    setLoading(true);
-    try {
-      await devLogin(devEmail.trim(), devPassword.trim());
-      router.replace(redirect);
-    } catch {
-      setError("Dev login failed. Make sure the backend is running in development mode.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function handleGoogleCredential(response: { credential: string }) {
     setError(null);
@@ -350,70 +331,6 @@ function LoginContent() {
         )}
       </div>
 
-      {/* Dev tools panel — only visible in development */}
-      {isDev && (
-      <div className="mt-3 w-full rounded-xl border border-amber-400/30 bg-amber-50 overflow-hidden">
-        <button
-          onClick={() => setShowDevLogin((v) => !v)}
-          className="flex w-full items-center justify-between px-4 py-2.5 text-xs font-medium text-amber-700 hover:bg-amber-100/60 transition-colors"
-        >
-          <span className="flex items-center gap-1.5">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-            </svg>
-            Dev tools
-          </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={`transition-transform ${showDevLogin ? "rotate-180" : ""}`}>
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </button>
-
-        {showDevLogin && (
-          <div className="flex flex-col gap-3 px-4 pb-4">
-            {/* Preview mode — no backend needed */}
-            <button
-              onClick={() => { setPreviewToken(); router.replace(redirect); }}
-              className="rounded-lg border border-sky-300/50 bg-sky-50 py-2.5 text-sm font-semibold text-sky-700 hover:bg-sky-100 transition-colors"
-            >
-              Preview UI (no backend)
-            </button>
-
-            <div className="flex items-center gap-2">
-              <div className="h-px flex-1 bg-amber-300/30" />
-              <span className="text-[10px] text-amber-600/70">or with real backend</span>
-              <div className="h-px flex-1 bg-amber-300/30" />
-            </div>
-
-            <form onSubmit={handleDevLogin} className="flex flex-col gap-2">
-              <input
-                type="email"
-                placeholder="Email"
-                value={devEmail}
-                onChange={(e) => setDevEmail(e.target.value)}
-                required
-                className="w-full rounded-lg border border-amber-300/40 bg-white px-3 py-2 text-sm text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10"
-              />
-              <input
-                type="password"
-                placeholder="Any password"
-                value={devPassword}
-                onChange={(e) => setDevPassword(e.target.value)}
-                required
-                className="w-full rounded-lg border border-amber-300/40 bg-white px-3 py-2 text-sm text-[#191c1d] placeholder-[#707a6a] outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10"
-              />
-              {error && <p className="text-xs text-red-700">{error}</p>}
-              <button
-                type="submit"
-                disabled={loading}
-                className="rounded-lg bg-amber-100 py-2 text-sm font-semibold text-amber-800 hover:bg-amber-200 disabled:opacity-50 transition-colors"
-              >
-                {loading ? "Signing in..." : "Dev Login (needs backend)"}
-              </button>
-            </form>
-          </div>
-        )}
-      </div>
-      )}
       </div>
     </div>
   );

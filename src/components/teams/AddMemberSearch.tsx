@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { searchUsers, type UserSummary } from "@/lib/api";
+import { inviteTeamMember, searchUsers, type UserSummary } from "@/lib/api";
 
 type Role = "player" | "captain";
 
@@ -10,10 +10,10 @@ type Props = {
   existingMemberIds: Set<string>;
   /** Called when admin picks a user and submits. */
   onAdd: (userId: string, role: Role) => Promise<void>;
-  /** URL to deep-link invitees to (usually the team page). */
-  inviteTargetUrl: string;
-  /** Team label used in the mailto body. */
-  teamName: string;
+  /** Team id — used for the invite-by-email endpoint. */
+  teamId: string;
+  /** Called after an invite email is sent successfully (refresh UI). */
+  onInviteSent?: () => void;
 };
 
 function initials(name?: string | null, email?: string | null): string {
@@ -36,8 +36,8 @@ function isValidEmail(s: string): boolean {
 export default function AddMemberSearch({
   existingMemberIds,
   onAdd,
-  inviteTargetUrl,
-  teamName,
+  teamId,
+  onInviteSent,
 }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<UserSummary[]>([]);
@@ -45,7 +45,30 @@ export default function AddMemberSearch({
   const [selected, setSelected] = useState<UserSummary | null>(null);
   const [role, setRole] = useState<Role>("player");
   const [adding, setAdding] = useState(false);
+  const [inviting, setInviting] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleInvite(email: string) {
+    setInviting(true);
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const result = await inviteTeamMember(teamId, email, role);
+      if (result.status === "added") {
+        setStatusMsg(`${email} was already on Signal Shift — added to the team.`);
+        onInviteSent?.();
+      } else {
+        setStatusMsg(`Invitation sent to ${email}. They'll join when they sign up.`);
+      }
+      setQuery("");
+      setResults([]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't send invite.");
+    } finally {
+      setInviting(false);
+    }
+  }
 
   // Debounced search
   useEffect(() => {
@@ -177,14 +200,22 @@ export default function AddMemberSearch({
               </button>
             );
           })}
-          {noResults && <NoResults query={query} inviteTargetUrl={inviteTargetUrl} teamName={teamName} queryLooksLikeEmail={queryLooksLikeEmail} />}
+          {noResults && (
+            <NoResults
+              query={query}
+              queryLooksLikeEmail={queryLooksLikeEmail}
+              inviting={inviting}
+              onInvite={handleInvite}
+            />
+          )}
         </div>
       )}
 
+      {statusMsg && <p className="text-xs text-[#b2f746]">{statusMsg}</p>}
       {error && <p className="text-xs text-rose-300">{error}</p>}
 
       <p className="text-[11px] leading-relaxed text-white/40">
-        Type part of a name or email to find existing players. If they aren&rsquo;t on Signal Shift yet, we&rsquo;ll open your email app with a pre-filled invite.
+        Type part of a name or email to find existing players. If they aren&rsquo;t on Signal Shift yet, we&rsquo;ll email them a sign-up link from our servers.
       </p>
     </div>
   );
@@ -211,53 +242,40 @@ function UserTile({ user }: { user: UserSummary }) {
 
 function NoResults({
   query,
-  inviteTargetUrl,
-  teamName,
   queryLooksLikeEmail,
+  inviting,
+  onInvite,
 }: {
   query: string;
-  inviteTargetUrl: string;
-  teamName: string;
   queryLooksLikeEmail: boolean;
+  inviting: boolean;
+  onInvite: (email: string) => void;
 }) {
   const trimmed = query.trim();
-  const subject = `Join ${teamName} on Signal Shift`;
-  const fullUrl =
-    typeof window !== "undefined" && inviteTargetUrl.startsWith("/")
-      ? `${window.location.origin}${inviteTargetUrl}`
-      : inviteTargetUrl;
-  const body = [
-    `Hey,`,
-    ``,
-    `I just added you to ${teamName} on Signal Shift — the turf-booking app we use.`,
-    ``,
-    `Sign up with this email (${queryLooksLikeEmail ? trimmed : "your email"}) to get started, then I'll add you to the team.`,
-    ``,
-    `${fullUrl}`,
-    ``,
-    `— sent from Signal Shift`,
-  ].join("\n");
-  const to = queryLooksLikeEmail ? trimmed : "";
-  const mailto = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
   return (
     <div className="flex flex-col gap-2 px-3 py-3">
       <p className="text-xs text-white/60">
         No users match <span className="font-semibold text-white">&ldquo;{trimmed}&rdquo;</span> on Signal Shift yet.
       </p>
-      <a
-        href={mailto}
-        className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[#b2f746] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#121f00] hover:bg-white"
-      >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-          <polyline points="22,6 12,13 2,6" />
-        </svg>
-        {queryLooksLikeEmail ? `Invite ${trimmed}` : "Invite by email"}
-      </a>
-      <p className="text-[11px] text-white/40">
-        Opens your email app. Once they sign up, come back and add them.
-      </p>
+      {queryLooksLikeEmail ? (
+        <button
+          type="button"
+          onClick={() => onInvite(trimmed)}
+          disabled={inviting}
+          className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[#b2f746] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-[#121f00] transition-colors hover:bg-white disabled:opacity-50"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+          {inviting ? "Sending…" : `Email invite to ${trimmed}`}
+        </button>
+      ) : (
+        <p className="text-[11px] text-white/40">
+          Type a full email address to send them an invitation to join Signal Shift.
+        </p>
+      )}
     </div>
   );
 }

@@ -154,8 +154,10 @@ function TeamDetailContent() {
             <AddMemberSearch
               existingMemberIds={new Set(members.map((m) => m.user_id))}
               onAdd={handleAdd}
-              inviteTargetUrl={`/teams/${team.slug}?id=${team.id}`}
-              teamName={team.name}
+              teamId={team.id}
+              onInviteSent={() => {
+                getTeamMembers(teamId).then(setMembers).catch(() => {});
+              }}
             />
           </div>
         )}

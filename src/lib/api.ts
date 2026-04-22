@@ -428,3 +428,14 @@ export async function addTeamMember(
 export async function removeTeamMember(teamId: string, userId: string) {
   return api.delete<void>(`/teams/${teamId}/members/${userId}`);
 }
+
+export async function inviteTeamMember(
+  teamId: string,
+  email: string,
+  role = "player"
+) {
+  return api.post<{ status: "added" | "invited"; email: string; user_id: string | null }>(
+    `/teams/${teamId}/invite`,
+    { email, role },
+  );
+}

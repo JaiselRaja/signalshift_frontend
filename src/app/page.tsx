@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import PlansPreview from "@/components/plans/PlansPreview";
 
 const TESTIMONIALS = [
   {
@@ -301,6 +302,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <PlansPreview />
+
 
       {/* ───── Final CTA ───── */}
       <section className="relative min-h-[500px] flex items-center justify-center overflow-hidden">

@@ -4,30 +4,45 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getToken, listTeams } from "@/lib/api";
 import type { TeamRead } from "@/types";
-import TeamCard from "@/components/teams/TeamCard";
 import CreateTeamForm from "@/components/teams/CreateTeamForm";
+import PageHero from "@/components/v1/PageHero";
+import PageStats from "@/components/v1/PageStats";
+import PageFAQ from "@/components/v1/PageFAQ";
+import CTABanner from "@/components/v1/CTABanner";
 
-function TeamSkeleton() {
+const FAQS = [
+  {
+    q: "How many teams can I be part of?",
+    a: "No limit — join as many teams as you can keep up with. Each team has its own captain and roster.",
+  },
+  {
+    q: "Can I be captain of multiple teams?",
+    a: "Yes. You'll see a separate captain dashboard for each one.",
+  },
+  {
+    q: "How do I add players to my team?",
+    a: "Go to your team page, click Add Member, and search by name or email.",
+  },
+];
+
+function teamInitials(name: string): string {
   return (
-    <div className="flex gap-4 rounded-3xl bg-white p-5 ring-1 ring-black/[0.04]">
-      <div className="skeleton h-16 w-16 shrink-0 rounded-2xl" />
-      <div className="flex flex-1 flex-col gap-3">
-        <div className="skeleton h-4 w-1/2" />
-        <div className="skeleton h-3 w-1/3" />
-        <div className="skeleton mt-auto h-6 w-full" />
-      </div>
-    </div>
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase() ?? "")
+      .join("") || "??"
   );
 }
 
-function TeamsContent() {
+export default function TeamsPage() {
   const router = useRouter();
   const [teams, setTeams] = useState<TeamRead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
-  const [sportFilter, setSportFilter] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+  const [sport, setSport] = useState("All");
 
   useEffect(() => {
     listTeams()
@@ -36,15 +51,45 @@ function TeamsContent() {
       .finally(() => setLoading(false));
   }, []);
 
+  const sports = useMemo(() => {
+    const set = new Set<string>(["All"]);
+    teams.forEach((t) => {
+      if (t.sport_type) set.add(t.sport_type);
+    });
+    return [...set];
+  }, [teams]);
+
+  const filtered = useMemo(
+    () => (sport === "All" ? teams : teams.filter((t) => t.sport_type === sport)),
+    [teams, sport],
+  );
+
+  const stats = useMemo(() => {
+    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const sportSet = new Set(teams.map((t) => t.sport_type).filter(Boolean));
+    const newThisWeek = teams.filter(
+      (t) => new Date(t.created_at).getTime() > oneWeekAgo,
+    ).length;
+    return {
+      total: teams.length,
+      sports: sportSet.size,
+      newThisWeek,
+    };
+  }, [teams]);
+
   function handleCreate() {
     if (!getToken()) {
       router.push(`/login?redirect=${encodeURIComponent("/teams")}`);
       return;
     }
     setShowCreate(true);
-    setTimeout(() => {
-      document.getElementById("create-team-anchor")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
+    setTimeout(
+      () =>
+        document
+          .getElementById("create-team-anchor")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+      100,
+    );
   }
 
   function handleCreated(team: TeamRead) {
@@ -52,218 +97,183 @@ function TeamsContent() {
     setShowCreate(false);
   }
 
-  const sports = useMemo(
-    () => [...new Set(teams.map((t) => t.sport_type.toLowerCase()))].sort(),
-    [teams]
-  );
-
-  const filtered = useMemo(() => {
-    return teams.filter((t) => {
-      if (sportFilter && t.sport_type.toLowerCase() !== sportFilter) return false;
-      if (search && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
-      return true;
-    });
-  }, [teams, sportFilter, search]);
-
-  const sportBreakdown = useMemo(() => {
-    const m = new Map<string, number>();
-    teams.forEach((t) => {
-      const k = t.sport_type;
-      m.set(k, (m.get(k) ?? 0) + 1);
-    });
-    return [...m.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 4);
-  }, [teams]);
-
   return (
     <div>
-      {/* ─── Hero ─────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-white/[0.06] bg-[#111211]">
-        <div className="grain-overlay pointer-events-none absolute inset-0" />
+      <PageHero
+        eyebrow="The Squads"
+        head1="Roll with"
+        italicWord="your"
+        head2="crew."
+        subtitle="Make a team, pick a captain, bring the chaos. Win together, lose together — book faster with your squad saved."
+      />
 
-        {/* Decorative lime cluster */}
-        <div
-          aria-hidden
-          className="absolute -left-20 top-1/2 hidden h-56 w-56 -translate-y-1/2 rounded-full bg-[#b2f746]/20 blur-3xl md:block"
-        />
+      <div className="px-6 pb-8">
+        <div className="mx-auto max-w-6xl">
+          <PageStats
+            stats={[
+              { value: String(stats.total), label: "Active teams" },
+              { value: `${(stats.total * 8 || 0).toLocaleString()}`, label: "Players across teams" },
+              { value: String(stats.sports || 0), label: "Sports played" },
+              { value: String(stats.newThisWeek), label: "New this week" },
+            ]}
+          />
+        </div>
+      </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-20">
-          <p className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.3em] text-[#b2f746]">
-            · The Squads · Built for Battle ·
-          </p>
-          <h1 className="font-display text-5xl font-black leading-[0.95] tracking-tight text-white md:text-7xl">
-            Roll with your
-            <br />
-            <span className="italic text-[#b2f746]">crew.</span>
-          </h1>
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-white/70 md:text-base">
-            Make a team, pick a captain, bring the chaos. Win together, lose
-            together — and book slots faster with your squad saved.
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <button
-              onClick={handleCreate}
-              className="shine relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-[#b2f746] px-5 py-2.5 text-sm font-bold text-[#121f00] shadow-lg shadow-[#b2f746]/20 transition-transform hover:scale-[1.03]"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              Start a team
-            </button>
-
-            {/* Mini sport breakdown tags */}
-            {sportBreakdown.length > 0 && (
-              <div className="flex items-center gap-2 text-[11px] text-white/60">
-                <span className="font-mono uppercase tracking-[0.14em]">·</span>
-                {sportBreakdown.map(([sport, count], i) => (
-                  <span key={sport} className="flex items-center gap-1">
-                    <span className="font-bold text-white">{count}</span>
-                    <span className="font-mono uppercase tracking-wider">{sport}</span>
-                    {i < sportBreakdown.length - 1 && <span className="text-white/20">·</span>}
-                  </span>
-                ))}
-              </div>
-            )}
+      {/* Sticky filter bar */}
+      <div className="sticky top-[72px] z-10 border-y border-white/[0.06] bg-[#0a0b0c]/90 px-6 py-4 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={handleCreate}
+            className="rounded-full bg-[#b2f746] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#121f00] transition-transform hover:scale-[1.03]"
+          >
+            + Start a team
+          </button>
+          <div className="flex gap-1.5 overflow-x-auto">
+            {sports.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSport(s)}
+                className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${
+                  sport === s
+                    ? "border-[#b2f746] bg-[#b2f746] text-[#121f00]"
+                    : "border-white/10 bg-white/[0.03] text-white/60 hover:text-white"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* ─── Filters ─────────────────────────────── */}
-      <section className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#0a0b0c]/90 backdrop-blur-xl">
-        <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <div className="flex flex-col gap-3 py-4 md:flex-row md:items-center">
-            <div className="relative flex-1 md:max-w-sm">
-              <svg className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
-              </svg>
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search teams…"
-                className="w-full rounded-full border border-white/10 bg-white/[0.03] px-10 py-2.5 text-sm text-white placeholder-white/40 outline-none transition-colors focus:border-[#b2f746]/50 focus:ring-2 focus:ring-[#b2f746]/15"
-              />
+      <section className="px-6 py-10 md:py-12">
+        <div className="mx-auto max-w-6xl">
+          {showCreate && (
+            <div id="create-team-anchor" className="mb-8">
+              <CreateTeamForm onCreated={handleCreated} onCancel={() => setShowCreate(false)} />
             </div>
-            <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 no-scrollbar md:mx-0 md:px-0">
-              <FilterPill active={!sportFilter} onClick={() => setSportFilter(null)} label="All" />
-              {sports.map((s) => (
-                <FilterPill
-                  key={s}
-                  active={sportFilter === s}
-                  onClick={() => setSportFilter(sportFilter === s ? null : s)}
-                  label={s}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+          )}
 
-      {/* ─── Content ─────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-12">
-        {error && (
-          <div className="mb-6 rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>
-        )}
-
-        {/* Create-team form (in-page) */}
-        {showCreate && (
-          <div id="create-team-anchor" className="mb-8">
-            <CreateTeamForm onCreated={handleCreated} onCancel={() => setShowCreate(false)} />
-          </div>
-        )}
-
-        <div className="mb-6 flex items-end justify-between">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-white md:text-3xl">
-              Directory
-            </h2>
-            <p className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-white/50">
+          <div className="mb-6">
+            <h2 className="font-display text-2xl font-black text-white">Directory</h2>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-white/50">
               {loading ? "…" : `${filtered.length} of ${teams.length} teams`}
             </p>
           </div>
-          {(search || sportFilter) && (
-            <button
-              onClick={() => { setSearch(""); setSportFilter(null); }}
-              className="text-xs font-semibold uppercase tracking-wider text-[#b2f746] underline-offset-4 hover:underline"
-            >
-              Reset →
-            </button>
+
+          {error && (
+            <div className="mb-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 px-5 py-4 text-sm text-rose-300">
+              {error}
+            </div>
+          )}
+
+          {loading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-44 animate-pulse rounded-3xl border border-white/[0.06] bg-white/[0.03]"
+                />
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02] py-20 text-center">
+              <h3 className="font-display text-xl font-bold text-white">
+                {teams.length === 0 ? "Be the first crew" : "No matches"}
+              </h3>
+              <p className="mt-1 max-w-xs text-sm text-white/60">
+                {teams.length === 0
+                  ? "No teams yet — start one and others will follow."
+                  : "Try a different sport filter."}
+              </p>
+              {teams.length === 0 && (
+                <button
+                  type="button"
+                  onClick={handleCreate}
+                  className="mt-5 rounded-full bg-[#b2f746] px-5 py-2 text-xs font-bold uppercase tracking-wider text-[#121f00] hover:bg-white"
+                >
+                  Start a team
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => router.push(`/teams/${t.slug}?id=${t.id}`)}
+                  className="group flex flex-col gap-4 rounded-3xl border border-white/[0.06] bg-white/[0.03] p-5 text-left transition-all hover:-translate-y-1 hover:border-[#b2f746]/30"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#b2f746] font-display text-base font-black text-[#121f00]">
+                      {t.logo_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={t.logo_url} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        teamInitials(t.name)
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate font-display text-base font-black text-white">
+                        {t.name}
+                      </h3>
+                      <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-white/50">
+                        {t.sport_type}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl bg-white/[0.06]">
+                    <div className="flex flex-col items-center bg-[#0a0b0c] p-3">
+                      <span className="font-display text-base font-black text-white">—</span>
+                      <span className="text-[10px] text-white/50">Players</span>
+                    </div>
+                    <div className="flex flex-col items-center bg-[#0a0b0c] p-3">
+                      <span className="font-display text-base font-black text-white">
+                        {t.is_active ? "Live" : "—"}
+                      </span>
+                      <span className="text-[10px] text-white/50">Status</span>
+                    </div>
+                    <div className="flex flex-col items-center bg-[#0a0b0c] p-3">
+                      <span className="font-display text-base font-black text-[#b2f746]">
+                        {teamInitials(t.name)}
+                      </span>
+                      <span className="text-[10px] text-white/50">Captain</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.03] py-2 text-xs font-bold text-white/70 transition-colors group-hover:bg-white/[0.06]">
+                    View team
+                    <svg
+                      width="11"
+                      height="11"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14M13 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </button>
+              ))}
+            </div>
           )}
         </div>
-
-        {loading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => <TeamSkeleton key={i} />)}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02] py-20 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#b2f746]/10 text-[#b2f746]">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <h3 className="font-display text-xl font-bold text-white">
-              {teams.length === 0 ? "Be the first crew" : "No matches"}
-            </h3>
-            <p className="mt-1 max-w-xs text-sm text-white/60">
-              {teams.length === 0
-                ? "No teams yet — start one and others will follow."
-                : "Try a different search or clear your filters."}
-            </p>
-            {teams.length === 0 && (
-              <button
-                onClick={handleCreate}
-                className="mt-5 rounded-full bg-[#b2f746] px-5 py-2 text-xs font-semibold uppercase tracking-wider text-[#121f00] hover:bg-white"
-              >
-                Start a team
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="stagger grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((t, i) => (
-              <TeamCard
-                key={t.id}
-                team={t}
-                index={i}
-                onClick={() => router.push(`/teams/${t.slug}?id=${t.id}`)}
-              />
-            ))}
-          </div>
-        )}
       </section>
+
+      <PageFAQ items={FAQS} />
+      <CTABanner
+        eyebrow="No team yet?"
+        title="Start one in 30 seconds."
+        subtitle="Name your crew, pick a sport, and invite players by email. We'll handle the rest."
+        buttonLabel="Start a team"
+        href="/teams"
+      />
     </div>
   );
-}
-
-function FilterPill({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-[12px] font-semibold uppercase tracking-wider transition-all ${
-        active
-          ? "border-[#b2f746] bg-[#b2f746] text-[#121f00]"
-          : "border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:text-white"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-export default function TeamsPage() {
-  return <TeamsContent />;
 }

@@ -11,6 +11,7 @@ import type {
   MembershipRead,
   MatchRead,
   PaymentRead,
+  PlanRead,
   PriceBreakdown,
   RegistrationRead,
   RazorpayResponse,
@@ -438,4 +439,49 @@ export async function inviteTeamMember(
     `/teams/${teamId}/invite`,
     { email, role },
   );
+}
+
+// ─── Plans ────────────────────────────────────────────────────────────────────
+
+export async function listPlans() {
+  return api.get<PlanRead[]>("/plans/");
+}
+
+// ─── Subscriptions ────────────────────────────────────────────────────────────
+
+import type {
+  SubscriptionAvailabilitySlot,
+  SubscriptionInitiate,
+  SubscriptionInitiateResponse,
+  SubscriptionRead,
+} from "@/types";
+
+export async function getSubscriptionAvailability(
+  turfId: string,
+  dayOfWeek: number,
+  durationMins: number,
+  planId?: string,
+) {
+  const q = new URLSearchParams({
+    turf_id: turfId,
+    day_of_week: String(dayOfWeek),
+    duration_mins: String(durationMins),
+  });
+  if (planId) q.set("plan_id", planId);
+  return api.get<SubscriptionAvailabilitySlot[]>(`/subscriptions/availability?${q}`);
+}
+
+export async function initiateSubscription(body: SubscriptionInitiate) {
+  return api.post<SubscriptionInitiateResponse>("/subscriptions/initiate", body);
+}
+
+export async function submitSubscriptionUtr(subscriptionId: string, utr: string) {
+  return api.post<SubscriptionRead>("/subscriptions/submit-utr", {
+    subscription_id: subscriptionId,
+    utr,
+  });
+}
+
+export async function listMySubscriptions() {
+  return api.get<SubscriptionRead[]>("/subscriptions/me");
 }

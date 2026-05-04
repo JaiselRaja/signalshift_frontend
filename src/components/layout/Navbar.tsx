@@ -8,10 +8,11 @@ import { clearToken, getToken } from "@/lib/api";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
-  { name: "Turfs", href: "/turfs" },
+  { name: "Our Turf", href: "/turfs" },
   { name: "Tournaments", href: "/tournaments" },
   { name: "Teams", href: "/teams" },
   { name: "My Bookings", href: "/bookings" },
+  { name: "Plans", href: "/plans" },
 ];
 
 function MenuIcon() {

@@ -75,7 +75,12 @@ export type BookingStatus =
   | "refund_pending"
   | "refunded";
 
-export type BookingType = "regular" | "tournament" | "practice" | "event";
+export type BookingType =
+  | "regular"
+  | "tournament"
+  | "practice"
+  | "event"
+  | "subscription";
 
 export interface BookingCreate {
   turf_id: string;
@@ -290,6 +295,136 @@ export interface RegistrationRead {
   seed: number | null;
   group_name: string | null;
   created_at: string;
+}
+
+// ─── Plans ────────────────────────────────────────────────────────────────────
+
+export type PlanType = "monthly" | "daily";
+
+export interface PlanRead {
+  id: string;
+  tenant_id: string;
+  code: string;
+  name: string;
+  tagline: string | null;
+  plan_type: PlanType;
+  price: number | string; // backend serializes Decimal as string
+  price_unit: string;
+  hours_per_month: number | null;
+  discount_pct: number | null;
+  advance_window_days: number | null;
+  slot_window_start: string | null; // "HH:MM:SS" or null
+  slot_window_end: string | null;
+  perks: string[];
+  featured: boolean;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlanCreate {
+  code: string;
+  name: string;
+  tagline?: string | null;
+  plan_type: PlanType;
+  price: number;
+  price_unit: string;
+  hours_per_month?: number | null;
+  discount_pct?: number | null;
+  advance_window_days?: number | null;
+  perks: string[];
+  featured?: boolean;
+  display_order?: number;
+  is_active?: boolean;
+}
+
+export interface PlanUpdate {
+  name?: string;
+  tagline?: string | null;
+  plan_type?: PlanType;
+  price?: number;
+  price_unit?: string;
+  hours_per_month?: number | null;
+  discount_pct?: number | null;
+  advance_window_days?: number | null;
+  perks?: string[];
+  featured?: boolean;
+  display_order?: number;
+  is_active?: boolean;
+}
+
+// ─── Subscriptions ────────────────────────────────────────────────────────────
+
+export type SubscriptionStatus = "pending" | "active" | "cancelled" | "expired";
+
+export interface SubscriptionSlotInput {
+  day_of_week: number; // 0=Mon … 6=Sun
+  start_time: string; // "HH:MM:SS" or "HH:MM"
+  end_time?: string | null;
+}
+
+export interface SubscriptionInitiate {
+  plan_id: string;
+  turf_id: string;
+  slots: SubscriptionSlotInput[];
+}
+
+export interface SubscriptionSlotRead {
+  id: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+}
+
+export interface SubscriptionRead {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  plan_id: string;
+  turf_id: string;
+  status: SubscriptionStatus;
+  starts_on: string | null;
+  expires_on: string | null;
+  payment_id: string | null;
+  cancelled_at: string | null;
+  cancel_reason: string | null;
+  created_at: string;
+  updated_at: string;
+  slots: SubscriptionSlotRead[];
+  plan?: {
+    id: string;
+    code: string;
+    name: string;
+    plan_type: string;
+    price: number | string;
+    price_unit: string;
+    hours_per_month: number | null;
+  } | null;
+  payment?: {
+    id: string;
+    status: string;
+    utr: string | null;
+    amount: number | string;
+    currency: string;
+  } | null;
+}
+
+export interface SubscriptionInitiateResponse {
+  subscription: SubscriptionRead;
+  payment_id: string;
+  amount: number;
+  currency: string;
+  upi_uri: string;
+  upi_vpa: string;
+  payee_name: string;
+}
+
+export interface SubscriptionAvailabilitySlot {
+  start_time: string;
+  end_time: string;
+  available: boolean;
+  reason: string | null;
 }
 
 // ─── Google Identity Services (global type declaration) ──────────────────────

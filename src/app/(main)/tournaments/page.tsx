@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { listTournaments } from "@/lib/api";
 import type { TournamentRead, TournamentStatus } from "@/types";
-import TournamentCard from "@/components/tournaments/TournamentCard";
+import PageHero from "@/components/v1/PageHero";
+import PageStats from "@/components/v1/PageStats";
+import PageFAQ from "@/components/v1/PageFAQ";
+import CTABanner from "@/components/v1/CTABanner";
 
 type FilterTab = "all" | TournamentStatus;
 
@@ -16,208 +19,235 @@ const FILTER_TABS: { value: FilterTab; label: string }[] = [
   { value: "completed", label: "Completed" },
 ];
 
-function Skeleton() {
-  return (
-    <div className="rounded-3xl bg-white ring-1 ring-black/[0.04]">
-      <div className="flex gap-5 p-6">
-        <div className="skeleton h-20 w-1.5 rounded-full" />
-        <div className="flex-1 space-y-3">
-          <div className="skeleton h-4 w-28 rounded-full" />
-          <div className="skeleton h-6 w-2/3" />
-          <div className="skeleton h-3 w-1/2" />
-        </div>
-        <div className="skeleton h-12 w-24 rounded-lg" />
-      </div>
-    </div>
-  );
+const FAQS = [
+  {
+    q: "How do I register my team?",
+    a: 'Open any tournament with "Open" status, click Register, pick your team, and pay the entry fee. Roster locks 48 hours before kickoff.',
+  },
+  {
+    q: "What if my team has fewer players than required?",
+    a: "You can add temporary players (mercenaries) up to the registration deadline.",
+  },
+  {
+    q: "Are there refunds if a tournament is cancelled?",
+    a: "Full refunds processed within 5 business days, plus a 10% credit toward your next entry.",
+  },
+];
+
+function statusLabel(status: TournamentStatus): string {
+  if (status === "in_progress") return "Live";
+  if (status === "registration_open") return "Open";
+  if (status === "registration_closed") return "Upcoming";
+  if (status === "completed") return "Completed";
+  if (status === "cancelled") return "Cancelled";
+  return "Draft";
 }
 
-function TournamentsContent() {
+function statusPillClasses(status: TournamentStatus): string {
+  if (status === "in_progress")
+    return "bg-rose-500/15 text-rose-400";
+  if (status === "registration_open")
+    return "bg-[#b2f746]/15 text-[#b2f746]";
+  return "bg-white/10 text-white/60";
+}
+
+function statusBarClasses(status: TournamentStatus): string {
+  if (status === "in_progress") return "bg-rose-500";
+  if (status === "registration_open") return "bg-[#b2f746]";
+  return "bg-white/20";
+}
+
+function totalPrize(t: TournamentRead): number {
+  return Object.values(t.prize_pool ?? {})
+    .filter((v): v is number => typeof v === "number")
+    .reduce((a, b) => a + b, 0);
+}
+
+function formatDateRange(t: TournamentRead): string {
+  const start = new Date(t.tournament_starts);
+  const startStr = start.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+  if (!t.tournament_ends) return startStr;
+  const end = new Date(t.tournament_ends);
+  const endStr = end.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+  return `${startStr} – ${endStr}`;
+}
+
+export default function TournamentsPage() {
   const router = useRouter();
-  const [tournaments, setTournaments] = useState<TournamentRead[]>([]);
-  const [allCache, setAllCache] = useState<TournamentRead[] | null>(null);
+  const [allCache, setAllCache] = useState<TournamentRead[]>([]);
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     listTournaments()
-      .then((data) => {
-        setAllCache(data);
-        setTournaments(data);
-      })
+      .then(setAllCache)
       .catch(() => setError("Failed to load tournaments."))
       .finally(() => setLoading(false));
   }, []);
 
-  function handleTabChange(tab: FilterTab) {
-    setActiveTab(tab);
-    if (!allCache) return;
-    if (tab === "all") setTournaments(allCache);
-    else setTournaments(allCache.filter((t) => t.status === tab));
-  }
-
-  function handleOpen(t: TournamentRead) {
-    router.push(`/tournaments/${t.slug}?id=${t.id}`);
-  }
+  const filtered = useMemo(
+    () => (activeTab === "all" ? allCache : allCache.filter((t) => t.status === activeTab)),
+    [allCache, activeTab],
+  );
 
   const stats = useMemo(() => {
-    if (!allCache) return { live: 0, open: 0, upcoming: 0, totalPrize: 0 };
-    let live = 0, open = 0, upcoming = 0, totalPrize = 0;
+    let live = 0;
+    let open = 0;
+    let teams = 0;
+    let prize = 0;
     for (const t of allCache) {
       if (t.status === "in_progress") live++;
       if (t.status === "registration_open") open++;
-      if (t.status === "registration_closed") upcoming++;
-      const values = Object.values(t.prize_pool ?? {}).filter(
-        (v): v is number => typeof v === "number"
-      );
-      totalPrize += values.reduce((a, b) => a + b, 0);
+      teams += t.max_teams ?? t.min_teams ?? 0;
+      prize += totalPrize(t);
     }
-    return { live, open, upcoming, totalPrize };
+    return { live, open, teams, prize };
   }, [allCache]);
 
   return (
     <div>
-      {/* ─── Hero ─────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-white/[0.06] bg-[#111211]">
-        <div className="grain-overlay pointer-events-none absolute inset-0" />
+      <PageHero
+        eyebrow="The Bracket"
+        head1="The season is"
+        italicWord="always"
+        head2="on."
+        subtitle="Leagues, knockouts, friendlies. Register your team, climb the table, take the trophy."
+      />
 
-        {/* Decorative diagonal accent */}
-        <div
-          aria-hidden
-          className="absolute -right-20 top-12 hidden h-72 w-[60%] rotate-[-8deg] bg-gradient-to-r from-transparent via-[#b2f746]/10 to-[#b2f746]/20 blur-2xl md:block"
-        />
-
-        <div className="relative mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-20">
-          <p className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.3em] text-[#b2f746]">
-            · The Bracket · Play to Win ·
-          </p>
-          <h1 className="font-display text-5xl font-black leading-[0.95] tracking-tight text-white md:text-7xl">
-            The <span className="italic text-[#b2f746]">season</span>
-            <br />
-            is always on.
-          </h1>
-          <p className="mt-5 max-w-md text-sm leading-relaxed text-white/70 md:text-base">
-            Leagues, knockouts, friendlies. Register your team, climb the table,
-            and take the trophy. Fixtures get live.
-          </p>
-
-          {/* Stat strip */}
-          <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
-            <StatTile label="Live now" value={stats.live} accent={stats.live > 0} />
-            <StatTile label="Open to register" value={stats.open} />
-            <StatTile label="Upcoming" value={stats.upcoming} />
-            <StatTile
-              label="Prize pool"
-              value={stats.totalPrize > 0 ? `₹${Math.round(stats.totalPrize / 1000)}k` : "—"}
-              isString
-            />
-          </div>
+      <div className="px-6 pb-8">
+        <div className="mx-auto max-w-6xl">
+          <PageStats
+            stats={[
+              { value: String(stats.live), label: "Live now" },
+              { value: String(stats.open), label: "Open to register" },
+              { value: String(stats.teams || 0), label: "Teams competing" },
+              {
+                value: stats.prize > 0 ? `₹${(stats.prize / 100000).toFixed(2)}L` : "—",
+                label: "Total prize pool",
+              },
+            ]}
+          />
         </div>
-      </section>
+      </div>
 
-      {/* ─── Filter tabs ─────────────────────────── */}
-      <section className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#0a0b0c]/90 backdrop-blur-xl">
-        <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <div className="-mx-4 flex gap-1 overflow-x-auto px-4 py-4 no-scrollbar md:mx-0 md:px-0">
-            {FILTER_TABS.map((tab) => {
-              const count = allCache
-                ? tab.value === "all"
-                  ? allCache.length
-                  : allCache.filter((t) => t.status === tab.value).length
-                : null;
-              return (
-                <button
-                  key={tab.value}
-                  onClick={() => handleTabChange(tab.value)}
-                  className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-[12px] font-semibold uppercase tracking-wider transition-all ${
-                    activeTab === tab.value
-                      ? "border-[#b2f746] bg-[#b2f746] text-[#121f00]"
-                      : "border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:text-white"
-                  }`}
-                >
-                  {tab.label}
-                  {count != null && count > 0 && (
-                    <span className={`ml-1.5 ${activeTab === tab.value ? "text-[#121f00]/60" : "text-white/40"}`}>
-                      · {count}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+      {/* Sticky filter bar */}
+      <div className="sticky top-[72px] z-10 border-y border-white/[0.06] bg-[#0a0b0c]/90 px-6 py-4 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl gap-1.5 overflow-x-auto">
+          {FILTER_TABS.map((t) => (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => setActiveTab(t.value)}
+              className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all ${
+                activeTab === t.value
+                  ? "border-[#b2f746] bg-[#b2f746] text-[#121f00]"
+                  : "border-white/10 bg-white/[0.03] text-white/60 hover:text-white"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
-      </section>
+      </div>
 
-      {/* ─── List ─────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-12">
-        {error && (
-          <div className="mb-6 rounded-2xl bg-red-50 px-5 py-4 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        {loading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} />)}
-          </div>
-        ) : tournaments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02] py-20 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#b2f746]/10 text-[#b2f746]">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-                <path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
-                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
-                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-              </svg>
-            </div>
-            <h3 className="font-display text-xl font-bold text-white">
-              No tournaments {activeTab === "all" ? "yet" : `in "${FILTER_TABS.find((t) => t.value === activeTab)?.label}"`}
-            </h3>
-            <p className="mt-1 max-w-xs text-sm text-white/60">
-              {activeTab === "all"
-                ? "The first fixture drops soon — stay tuned."
-                : "Try a different status filter."}
+      <section className="px-6 py-10 md:py-12">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-6">
+            <h2 className="font-display text-2xl font-black text-white">Fixtures</h2>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-white/50">
+              {filtered.length} tournament{filtered.length === 1 ? "" : "s"}
             </p>
           </div>
-        ) : (
-          <div className="stagger flex flex-col gap-4">
-            {tournaments.map((t, i) => (
-              <TournamentCard key={t.id} tournament={t} index={i} onClick={() => handleOpen(t)} />
-            ))}
-          </div>
-        )}
+
+          {error && (
+            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 px-5 py-4 text-sm text-rose-300">
+              {error}
+            </div>
+          )}
+
+          {loading ? (
+            <div className="flex flex-col gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-28 animate-pulse rounded-3xl border border-white/[0.06] bg-white/[0.03]"
+                />
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02] py-20 text-center">
+              <h3 className="font-display text-xl font-bold text-white">No tournaments</h3>
+              <p className="mt-1 max-w-xs text-sm text-white/60">
+                The first fixture drops soon — stay tuned.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {filtered.map((t) => {
+                const prize = totalPrize(t);
+                return (
+                  <div
+                    key={t.id}
+                    className="group flex flex-col gap-5 rounded-3xl border border-white/[0.06] bg-white/[0.03] p-6 transition-all hover:-translate-y-0.5 hover:border-[#b2f746]/30 sm:flex-row sm:items-center"
+                  >
+                    <div
+                      className={`h-1 w-full rounded-full sm:h-20 sm:w-1.5 ${statusBarClasses(t.status)}`}
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${statusPillClasses(t.status)}`}
+                        >
+                          {t.status === "in_progress" && (
+                            <span className="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400" />
+                          )}
+                          {statusLabel(t.status)}
+                        </span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-white/40">
+                          {t.sport_type}
+                        </span>
+                      </div>
+                      <h3 className="mt-2 font-display text-lg font-black text-white md:text-xl">
+                        {t.name}
+                      </h3>
+                      <p className="mt-1 text-xs text-white/50">
+                        {formatDateRange(t)} · {t.max_teams ?? t.min_teams} teams
+                      </p>
+                    </div>
+                    {prize > 0 && (
+                      <div className="text-right">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                          Prize pool
+                        </p>
+                        <p className="font-display text-xl font-black text-[#b2f746]">
+                          ₹{(prize / 1000).toFixed(0)}k
+                        </p>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/tournaments/${t.slug}?id=${t.id}`)}
+                      className="rounded-full bg-[#b2f746] px-5 py-2.5 text-xs font-bold text-[#121f00] transition-transform hover:scale-[1.03]"
+                    >
+                      {t.status === "registration_open" ? "Register" : "View"}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </section>
+
+      <PageFAQ items={FAQS} />
+      <CTABanner
+        eyebrow="Want your own?"
+        title="Host a tournament."
+        subtitle="Build a bracket, invite teams, and let Signal Shift handle the rest — fixtures, standings, payments."
+        buttonLabel="Get in touch"
+        href="/profile"
+      />
     </div>
   );
-}
-
-function StatTile({
-  label,
-  value,
-  accent = false,
-  isString = false,
-}: {
-  label: string;
-  value: number | string;
-  accent?: boolean;
-  isString?: boolean;
-}) {
-  return (
-    <div className={`rounded-2xl border px-4 py-4 transition-colors ${accent ? "border-[#b2f746]/50 bg-[#b2f746]/10" : "border-white/10 bg-white/[0.03]"}`}>
-      <p className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${accent ? "text-[#b2f746]" : "text-white/50"}`}>
-        {label}
-      </p>
-      <p className={`mt-1 font-display text-3xl font-black leading-none tracking-tight md:text-4xl ${accent ? "text-[#b2f746]" : "text-white"}`}>
-        {isString ? value : value}
-        {!isString && accent && (
-          <span className="ml-1 inline-block animate-pulse text-xs">●</span>
-        )}
-      </p>
-    </div>
-  );
-}
-
-export default function TournamentsPage() {
-  return <TournamentsContent />;
 }

@@ -1,9 +1,10 @@
 import Link from "next/link";
 
 const EXPLORE = [
-  { label: "Browse Turfs", href: "/turfs" },
+  { label: "Our Turf", href: "/turfs" },
   { label: "Tournaments", href: "/tournaments" },
   { label: "Teams", href: "/teams" },
+  { label: "Plans", href: "/plans" },
 ];
 
 const ACCOUNT = [

@@ -8,6 +8,7 @@ import SportTag from "@/components/ui/SportTag";
 import AmenitiesList from "@/components/turfs/AmenitiesList";
 import SlotCalendar from "@/components/turfs/SlotCalendar";
 import SlotGrid, { SlotGridSkeleton } from "@/components/turfs/SlotGrid";
+import TurfHighlights from "@/components/turfs/TurfHighlights";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import { formatCurrency, toDateString, addDays, formatDate } from "@/lib/utils";
 import { MAX_SLOTS_PER_BOOKING, summarize, toggleSlot } from "@/lib/slotSelection";
@@ -113,6 +114,7 @@ function TurfDetailContent() {
   const hasOperatingHours = Object.keys(turf.operating_hours).length > 0;
 
   return (
+    <>
     <div className="mx-auto max-w-4xl px-4 py-6 md:px-6 md:py-10">
       {/* Back link */}
       <button
@@ -276,6 +278,9 @@ function TurfDetailContent() {
         </div>
       )}
     </div>
+
+    <TurfHighlights compact />
+    </>
   );
 }
 

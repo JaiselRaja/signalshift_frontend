@@ -10,26 +10,7 @@ import type { BookingRead, BookingType, TurfRead } from "@/types";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import CancelBookingModal from "@/components/bookings/CancelBookingModal";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
-import PageHero from "@/components/v1/PageHero";
-import PageStats from "@/components/v1/PageStats";
-import PageFAQ from "@/components/v1/PageFAQ";
-import CTABanner from "@/components/v1/CTABanner";
 import Link from "next/link";
-
-const FAQS = [
-  {
-    q: "How far in advance can I book?",
-    a: "Daily Pass users can book 24 hours ahead. Starter members get 3 days, Pro members get 7 days advance window.",
-  },
-  {
-    q: "Can I reschedule a booking?",
-    a: "Yes — up to 12 hours before. Tap any booking and choose Reschedule. We'll show you available slots.",
-  },
-  {
-    q: "What if it rains?",
-    a: "Covered turfs play through. Uncovered turfs auto-credit the lost hour to your account, plus 10% goodwill bonus.",
-  },
-];
 
 const UPCOMING_STATUSES = new Set(["pending", "confirmed"]);
 
@@ -95,29 +76,15 @@ function DashboardContent() {
       .finally(() => setLoading(false));
   }, []);
 
-  const { upcoming, past, monthHours, totalConfirmed } = useMemo(() => {
+  const { upcoming, past } = useMemo(() => {
     const sorted = [...bookings].sort((a, b) => {
       const da = a.booking_date + a.start_time;
       const db = b.booking_date + b.start_time;
       return da < db ? -1 : 1;
     });
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    monthStart.setHours(0, 0, 0, 0);
-    const monthMins = bookings
-      .filter(
-        (b) =>
-          new Date(b.booking_date) >= monthStart &&
-          (b.status === "confirmed" || b.status === "completed"),
-      )
-      .reduce((s, b) => s + (b.duration_mins ?? 0), 0);
     return {
       upcoming: sorted.filter(isUpcoming),
       past: sorted.filter((b) => !isUpcoming(b)).reverse(),
-      monthHours: Math.round((monthMins / 60) * 10) / 10,
-      totalConfirmed: bookings.filter(
-        (b) => b.status === "confirmed" || b.status === "completed",
-      ).length,
     };
   }, [bookings]);
 
@@ -134,28 +101,15 @@ function DashboardContent() {
 
   return (
     <div>
-      <PageHero
-        eyebrow="Your Schedule"
-        head1="Every match,"
-        italicWord="all"
-        head2="in one place."
-        subtitle="Track upcoming bookings, review past games, and reschedule with one tap. Your turf history, organized."
-      />
-
-      <div className="px-6 pb-8">
-        <div className="mx-auto max-w-6xl">
-          <PageStats
-            stats={[
-              { value: String(upcoming.length), label: "Upcoming" },
-              { value: String(totalConfirmed), label: "Total played" },
-              { value: `${monthHours}h`, label: "This month" },
-              { value: "Pitch A", label: "Your home court" },
-            ]}
-          />
+      <div className="px-6 pt-10 pb-6 md:pt-14">
+        <div className="mx-auto max-w-5xl">
+          <h1 className="font-display text-3xl font-black tracking-tight text-white md:text-4xl">
+            My Bookings
+          </h1>
         </div>
       </div>
 
-      <div className="sticky top-[72px] z-10 border-y border-white/[0.06] bg-[#0a0b0c]/90 px-6 py-4 backdrop-blur-xl">
+      <div className="sticky top-[81px] z-10 border-y border-white/[0.06] bg-[#0a0b0c]/90 px-6 py-4 backdrop-blur-xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
           <div className="flex gap-1.5">
             {(["upcoming", "past"] as const).map((t) => (
@@ -355,15 +309,6 @@ function DashboardContent() {
           )}
         </div>
       </section>
-
-      <PageFAQ items={FAQS} />
-      <CTABanner
-        eyebrow="Play more, save more"
-        title="Switch to a Monthly plan."
-        subtitle="Lock in a recurring weekly slot and save 25%+ on every booking. No lock-in, cancel anytime."
-        buttonLabel="See plans"
-        href="/plans"
-      />
 
       {cancelTarget && (
         <CancelBookingModal

@@ -1,16 +1,10 @@
 import Link from "next/link";
 
-const EXPLORE = [
-  { label: "Our Turf", href: "/turfs" },
-  { label: "Tournaments", href: "/tournaments" },
-  { label: "Teams", href: "/teams" },
-  { label: "Plans", href: "/plans" },
-];
-
 const ACCOUNT = [
   { label: "Sign In", href: "/login" },
   { label: "My Bookings", href: "/bookings" },
   { label: "Profile", href: "/profile" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const SOCIAL = [
@@ -68,7 +62,7 @@ export default function Footer() {
           </div>
 
           <Link
-            href="/turfs"
+            href="/login"
             className="hidden shrink-0 items-center gap-2 rounded-full bg-[#b2f746] px-5 py-2.5 text-sm font-bold text-[#121f00] shadow-lg shadow-[#b2f746]/10 transition-transform hover:scale-[1.03] md:inline-flex"
           >
             Find a slot
@@ -111,25 +105,30 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Link columns */}
-          <FooterColumn title="Explore" items={EXPLORE} />
+          {/* Link column */}
           <FooterColumn title="Account" items={ACCOUNT} />
 
           {/* Location / contact */}
-          <div className="col-span-2 md:col-span-3">
+          <div className="col-span-2 md:col-span-4">
             <h4 className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">
               Contact
             </h4>
             <p className="text-sm leading-relaxed text-white/70">
-              Ananthanadarkudy
+              Signal Shift Sports & Events Centre
               <br />
-              Kanyakumari district
+              Ananthanadarkudy, Kanyakumari district
               <br />
               Tamil Nadu, India
             </p>
             <a
+              href="tel:+918420058420"
+              className="mt-3 block text-sm font-semibold text-[#b2f746] underline-offset-4 hover:underline"
+            >
+              +91 84200 58420
+            </a>
+            <a
               href="mailto:signalshiftturf@gmail.com"
-              className="mt-3 inline-block text-sm font-semibold text-[#b2f746] underline-offset-4 hover:underline"
+              className="mt-1 inline-block text-sm font-semibold text-[#b2f746] underline-offset-4 hover:underline"
             >
               signalshiftturf@gmail.com
             </a>
@@ -160,7 +159,7 @@ function FooterColumn({
   items: { label: string; href: string }[];
 }) {
   return (
-    <div className="col-span-1 md:col-span-2">
+    <div className="col-span-1 md:col-span-3">
       <h4 className="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">
         {title}
       </h4>

@@ -8,11 +8,8 @@ import { clearToken, getToken } from "@/lib/api";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
-  { name: "Our Turf", href: "/turfs" },
-  { name: "Tournaments", href: "/tournaments" },
-  { name: "Teams", href: "/teams" },
   { name: "My Bookings", href: "/bookings" },
-  { name: "Plans", href: "/plans" },
+  { name: "Contact", href: "/contact" },
 ];
 
 function MenuIcon() {
@@ -58,7 +55,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0b0c]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:py-6">
           {/* Left: Logo */}
           <Link href="/" className="flex items-center gap-2.5">
             <Image
@@ -66,14 +63,14 @@ export default function Navbar() {
               alt="Signal Shift"
               width={40}
               height={37}
-              className="h-9 w-auto"
+              className="h-10 w-auto md:h-11"
             />
             <Image
               src="/logo-text.png"
               alt="Signal Shift"
               width={130}
               height={24}
-              className="h-5 w-auto brightness-0 invert sm:h-6"
+              className="h-6 w-auto brightness-0 invert sm:h-7"
             />
           </Link>
 
@@ -85,7 +82,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative text-sm font-semibold tracking-wide transition-colors ${
+                  className={`relative text-base font-semibold tracking-wide transition-colors ${
                     active
                       ? "text-white"
                       : "text-white/50 hover:text-white"
@@ -102,33 +99,33 @@ export default function Navbar() {
 
           {/* Right: Book Now / User menu + Mobile toggle */}
           <div className="flex items-center gap-3">
-            {isLoggedIn ? (
+            <Link
+              href="/login"
+              className="rounded-full bg-[#b2f746] px-5 py-2.5 text-sm font-bold tracking-wide text-[#121f00] shadow-lg shadow-[#b2f746]/10 transition-transform hover:scale-105 active:scale-95 sm:px-7 sm:py-3 sm:text-base"
+            >
+              Book Now
+            </Link>
+
+            {isLoggedIn && (
               <>
                 <Link
                   href="/profile"
-                  className="hidden h-9 w-9 items-center justify-center rounded-full bg-[#b2f746] text-xs font-black text-[#121f00] transition-transform hover:scale-105 md:flex"
+                  className="hidden h-10 w-10 items-center justify-center rounded-full bg-[#b2f746] text-xs font-black text-[#121f00] transition-transform hover:scale-105 md:flex"
                 >
                   Me
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="hidden text-sm font-semibold text-white/50 transition-colors hover:text-white md:block"
+                  className="hidden text-base font-semibold text-white/50 transition-colors hover:text-white md:block"
                 >
                   Sign Out
                 </button>
               </>
-            ) : (
-              <Link
-                href="/login"
-                className="rounded-full bg-[#b2f746] px-6 py-2.5 text-sm font-bold tracking-wide text-[#121f00] shadow-lg shadow-[#b2f746]/10 transition-transform hover:scale-105 active:scale-95"
-              >
-                Book Now
-              </Link>
             )}
 
             {/* Mobile hamburger */}
             <button
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/[0.06] md:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/[0.06] md:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
@@ -143,7 +140,7 @@ export default function Navbar() {
         <div className="fixed inset-0 z-40 md:hidden" onClick={() => setMobileOpen(false)}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           <nav
-            className="absolute left-0 right-0 top-[73px] border-b border-white/[0.06] bg-[#0a0b0c]/95 px-6 py-5 backdrop-blur-xl shadow-xl animate-fade-in"
+            className="absolute left-0 right-0 top-[81px] border-b border-white/[0.06] bg-[#0a0b0c]/95 px-6 py-5 backdrop-blur-xl shadow-xl animate-fade-in"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col gap-1">

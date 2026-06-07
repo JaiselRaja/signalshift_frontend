@@ -14,6 +14,7 @@ import type {
   PlanRead,
   PriceBreakdown,
   RegistrationRead,
+  RazorpayInitiateResponse,
   RazorpayResponse,
   TeamRead,
   TeamStanding,
@@ -308,8 +309,8 @@ export async function cancelBooking(bookingId: string, reason: string) {
 
 // ─── Payments ─────────────────────────────────────────────────────────────────
 
-export async function initiatePayment(bookingId: string) {
-  return api.post<PaymentRead>("/payments/initiate", { booking_id: bookingId });
+export async function initiatePayment(bookingId: string): Promise<RazorpayInitiateResponse> {
+  return api.post<RazorpayInitiateResponse>("/payments/initiate", { booking_id: bookingId });
 }
 
 export async function submitPaymentCallback(body: RazorpayResponse) {

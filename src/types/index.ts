@@ -474,6 +474,15 @@ declare global {
   }
 }
 
+export interface RazorpayInitiateResponse {
+  payment_id: string;
+  booking_id: string;
+  razorpay_order_id: string;
+  razorpay_key_id: string;
+  amount_paise: number;
+  currency: string;
+}
+
 export interface RazorpayOptions {
   key: string;
   amount: number;

@@ -38,7 +38,7 @@ export default function LandingPage() {
       <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-[#004900]">
         {/* Background image */}
         <Image
-          src="/hero-bg-v2.jpg"
+          src="/hero-bg-v3.jpg"
           alt="Stadium with floodlights at night"
           fill
           className="object-cover opacity-70"

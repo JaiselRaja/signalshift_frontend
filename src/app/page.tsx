@@ -4,6 +4,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import TurfHighlights from "@/components/turfs/TurfHighlights";
 import MapEmbed from "@/components/MapEmbed";
+import GalleryGrid from "@/components/gallery/GalleryGrid";
+import { GALLERY_PHOTOS } from "@/components/gallery/photos";
 
 const TESTIMONIALS = [
   {
@@ -107,6 +109,36 @@ export default function LandingPage() {
       </section>
 
       <TurfHighlights />
+
+      {/* ───── Gallery preview ───── */}
+      <section className="bg-[#0a0b0c] px-6 py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.3em] text-[#b2f746]">
+                · Gallery ·
+              </p>
+              <h2 className="font-display text-4xl font-black tracking-tight text-white md:text-5xl">
+                See the turf
+              </h2>
+              <p className="mt-4 max-w-xl text-lg text-white/60">
+                Photos from the ground. Drone shots, floodlit nights, weekend matches.
+              </p>
+            </div>
+            <Link
+              href="/gallery"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#b2f746]/40 bg-[#b2f746]/10 px-6 py-3 text-sm font-bold text-[#b2f746] transition-colors hover:bg-[#b2f746]/15"
+            >
+              View full gallery
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M5 12h14M13 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+
+          <GalleryGrid photos={GALLERY_PHOTOS.slice(0, 6)} compact />
+        </div>
+      </section>
 
       {/* ───── Why Signal Shift Matters (Bento Grid) ───── */}
       <section className="relative bg-[#0a0b0c] px-6 py-24">

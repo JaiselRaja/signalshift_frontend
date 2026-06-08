@@ -8,6 +8,7 @@ import { clearToken, getToken } from "@/lib/api";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
+  { name: "Gallery", href: "/gallery" },
   { name: "My Bookings", href: "/bookings" },
   { name: "Contact", href: "/contact" },
 ];

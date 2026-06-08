@@ -360,8 +360,8 @@ export default function LandingPage() {
       <section className="relative min-h-[500px] flex items-center justify-center overflow-hidden">
         {/* Background image */}
         <Image
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDlAuAW6fKqghGMTV9lLhYrbD7tY41aWgQip7ad-gNVTWD12jy3zHAazYLoPNr7u0QPh_AURYzumWwrVZzFltKe0jOnu6ncxakqHp5Sz6nLPamE8wRYWF6wv1BRr9WBPwUvO4nRxTkCu_D43glo4KUJNM4JbEqOMCL-imfbWZHD2AAt2h3uBFYiTHzbNZu1LZIvm-RNisYpLeX0xFIJKsqpd4VktY5NzJm-P0AXB_F-gKZ5muD1MUmamgFPIjE-37x-AARJIOSSiY"
-          alt="Turf at night"
+          src="/entrance.jpg"
+          alt="Signal Shift entrance"
           fill
           className="object-cover"
         />
